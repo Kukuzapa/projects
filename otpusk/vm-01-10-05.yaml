@@ -1,0 +1,481 @@
+openapi: 3.0.0
+info:
+  title: Менеджер отпусков
+  description: vacation manager
+  version: '0.1'
+servers:
+  - url: 'http://localhost:8082/vm'
+paths:
+  /admin/new:
+    get:
+      summary: get new vacations list
+      tags:
+        - admin
+      parameters:
+        - in: query
+          name: userid
+          schema:
+            type: string
+        - in: query
+          name: clname
+          schema:
+            type: string
+        - in: query
+          name: count
+          schema:
+            type: string
+        - in: query
+          name: page
+          schema:
+            type: string
+        - in: query
+          name: limit
+          schema:
+            type: string
+      responses:
+        '200':
+          description: OK
+  /admin/list:
+    get:
+      summary: get current vacations list
+      tags:
+        - admin
+      parameters:
+        - in: query
+          name: userid
+          schema:
+            type: string
+        - in: query
+          name: clid
+          schema:
+            type: string
+        - in: query
+          name: clname
+          schema:
+            type: string
+        - in: query
+          name: count
+          schema:
+            type: string
+        - in: query
+          name: page
+          schema:
+            type: string
+        - in: query
+          name: limit
+          schema:
+            type: string
+      responses:
+        '200':
+          description: OK
+  /admin/history:
+    get:
+      summary: get old vacations list
+      tags:
+        - admin
+      parameters:
+        - in: query
+          name: userid
+          schema:
+            type: string
+        - in: query
+          name: clname
+          schema:
+            type: string
+        - in: query
+          name: count
+          schema:
+            type: string
+        - in: query
+          name: page
+          schema:
+            type: string
+        - in: query
+          name: limit
+          schema:
+            type: string
+      responses:
+        '200':
+          description: OK
+  /admin/user:
+    post:
+      summary: set admins and competenses
+      tags:
+        - admin
+      parameters:
+        - in: query
+          name: userid
+          schema:
+            type: string
+        - in: query
+          name: token
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/users_req'
+      responses:
+        '200':
+          description: OK  
+  /admin/vacation/{command}:
+    post:
+      summary: vacation decision
+      tags:
+        - admin
+      parameters:
+        - in: path
+          name: command
+          required: true
+          schema:
+            type: string
+            enum: ['accept','reject']
+        - in: query
+          name: userid
+          schema:
+            type: string
+        - in: query
+          name: token
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/vacation_req'
+      responses:
+        '200':
+          description: OK
+  /vacations:
+    get:
+      summary: get count and vacation type
+      tags:
+        - base
+      parameters: 
+        - in: query
+          name: userid
+          schema:
+            type: string
+        - in: query
+          name: clid
+          schema:
+            type: string
+        - in: query
+          name: period
+          schema:
+            type: string
+      responses:
+        '200':
+          description: OK
+  /comment:
+    get:
+      summary: get vacation comments
+      tags:
+        - base
+      parameters:
+        - in: query
+          name: userid
+          schema:
+            type: string
+        - in: query
+          name: vacid
+          schema:
+            type: string
+        - in: query
+          name: token
+          schema:
+            type: string
+      responses:
+        '200':
+          description: OK
+    post:
+      summary: set vacation comment
+      tags:
+        - base
+      parameters:
+        - in: query
+          name: userid
+          schema:
+            type: string
+        - in: query
+          name: token
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/vacation_req'
+      responses:
+        '200':
+          description: OK
+  /cross:
+    get:
+      summary: vacation cross
+      tags:
+        - base
+      parameters:
+        - in: query
+          name: userid
+          schema:
+            type: string
+        - in: query
+          name: vacid
+          schema:
+            type: string 
+        - in: query
+          name: clid
+          schema:
+            type: string
+        - in: query
+          name: token
+          schema:
+            type: string
+      responses:
+        '200':
+          description: OK
+  /find:
+    get:
+      summary: find client
+      tags:
+        - base
+      parameters:
+        - in: query
+          name: userid
+          schema:
+            type: string
+        - in: query
+          name: clname
+          schema:
+            type: string
+        - in: query
+          name: token
+          schema:
+            type: string
+      responses:
+        '200':
+          description: OK
+  /log:
+    get:
+      summary: get log
+      tags:
+        - base
+      parameters:
+        - in: query
+          name: userid
+          schema:
+            type: string
+        - in: query
+          name: vacid
+          schema:
+            type: string
+        - in: query
+          name: count
+          schema:
+            type: string
+        - in: query
+          name: page
+          schema:
+            type: string
+        - in: query
+          name: limit
+          schema:
+            type: string
+        - in: query
+          name: clname
+          schema:
+            type: string
+      responses:
+        '200':
+          description: OK
+  /users:
+    get:
+      summary: get users list
+      tags:
+        - base
+      parameters:
+        - in: query
+          name: userid
+          schema:
+            type: string
+        - in: query
+          name: clid
+          schema:
+            type: string
+        - in: query
+          name: clname
+          schema:
+            type: string
+        - in: query
+          name: token
+          schema:
+            type: string
+      responses:
+        '200':
+          description: OK
+  /user/login:
+    get:
+      summary: login
+      tags: 
+        - user
+      parameters:
+        - in: query
+          name: token
+          schema:
+            type: string
+        - in: query
+          name: name
+          schema:
+            type: string
+        - in: query
+          name: userid
+          schema:
+            type: string
+        - in: query
+          name: email
+          schema:
+            type: string
+      responses:
+        '200':
+          description: OK
+  /user/vacation/{command}:
+    post:
+      summary: create vacation
+      tags:
+        - user
+      parameters:
+        - in: path
+          name: command
+          required: true
+          schema:
+            type: string
+            enum: ['check','send']
+        - in: query
+          name: userid
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/create_vacation_req'
+      responses:
+        '200':
+          description: OK
+  /user/vacation/cancel:
+    post:
+      summary: cancel vacation
+      tags:
+        - user
+      parameters:
+        - in: query
+          name: userid
+          schema:
+            type: string
+        - in: query
+          name: token
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/vacation_req'
+      responses:
+        '200':
+          description: OK
+  /user/list:
+    get:
+      summary: vacation list
+      tags:
+        - user
+      parameters:
+        - in: query
+          name: userid
+          required: true
+          schema:
+            type: string
+        - in: query
+          name: token
+          schema:
+            type: string
+      responses:
+        '200':
+          description: OK
+  /user/history:
+    get:
+      summary: vacation list
+      tags:
+        - user
+      parameters:
+        - in: query
+          name: userid
+          required: true
+          schema:
+            type: string
+        - in: query
+          name: token
+          schema:
+            type: string
+      responses:
+        '200':
+          description: OK
+  /user/get:
+    get:
+      summary: get user info
+      tags:
+        - user
+      parameters:
+        - in: query
+          name: userid
+          required: true
+          schema:
+            type: string
+        - in: query
+          name: token
+          schema:
+            type: string
+      responses:
+        '200':
+          description: OK
+components:
+  schemas:
+    users_req:
+      type: object
+      properties:
+        clid:
+          type: string
+        isadmin:
+          type: boolean
+        competenses:
+          type: string
+    create_vacation_req:
+      type: object
+      properties:
+        begin_date:
+          type: string
+          format: date
+          example: '1983-01-07'
+        end_date:
+          type: string
+          format: date
+          example: '1983-01-28'
+        comment:
+          type: string
+        type:
+          type: string
+      required:
+        - begin_date
+        - end_date
+    vacation_req:
+      type: object
+      properties:
+        vacid:
+          type: string
+        name:
+          type: string
+        comment:
+          type: string
+      required:
+        - vacid

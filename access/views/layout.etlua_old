@@ -1,0 +1,641 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+		
+		<!--bootstrap css-->
+		<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.0/css/bootstrap.min.css" integrity="sha384-9gVQ4dYFwwWSjIDZnLEWnxCjeSWFphJiwGPXr1jddIhOegiu1FwO5qRGvFXOdJZ4" crossorigin="anonymous">
+
+		<!--библиотека для рисования дерева css-->
+		<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jquery.fancytree/2.29.1/skin-lion/ui.fancytree.min.css" integrity="sha256-qnS7hm9odhIyZ8dpDSrw3fa8+4jd2iWFvVeN7+SQ6VQ=" crossorigin="anonymous" />
+		
+		<title>Access manager</title>
+	</head>
+	<body>
+		<div class="container" id="main">
+			<div class="row">
+				<div class="col-12 text-center">
+					Access Manager
+				</div>
+				
+				<form class="col-12">
+					<div class="form-group">
+    					<select class="form-control" @change='get_user' v-model="user_id">
+							<option disabled value="" selected>Выберите пользователя</option>
+			      			<option v-for="user in user_list" :value="user.id">{{user.user}}</option>
+			    		</select>
+  					</div>
+  				</form>
+  				
+  				<div class="col-3 mb-2">
+  					<button type="button" class="btn btn-primary btn-block" v-if="check_tree" @click="blck_show('node')">Дерево</button>
+  				</div>
+  				<div class="col-3 mb-2">
+  					<button type="button" class="btn btn-primary btn-block" v-if="check_role" @click="blck_show('role')">Роли</button>
+  				</div>
+  				<div class="col-3 mb-2">
+  					<button type="button" class="btn btn-primary btn-block" v-if="check_user" @click="blck_show('user')">Пользователи</button>
+  				</div>
+  				<div class="col-3 mb-2">
+  					<button type="button" class="btn btn-primary btn-block" v-if="check_info" @click="blck_show('info')">Информация</button>
+  				</div>
+  			</div>
+			
+  			<component v-bind:is="currentBlck" :info="user_info" :user="user_id"></component>
+			
+		</div>
+
+
+		<script src="https://code.jquery.com/jquery-3.3.1.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.0/umd/popper.min.js" integrity="sha384-cs/chFZiN24E4KMATLdqdvsezGxaGsi4hLGOzlXwp5UZB1LY//20VyM2taTB4QvJ" crossorigin="anonymous"></script>
+		<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.0/js/bootstrap.min.js" integrity="sha384-uefMccjFJAIv6A+rW+L4AHf99KvxDjWSu1z9VI8SKNVmz4sk7buKt/6v9KI65qnm" crossorigin="anonymous"></script>
+
+		<!--Библиотека рисования дерева and vue and axios-->
+		<script src="https://cdn.jsdelivr.net/npm/vue@2.5.16/dist/vue.js"></script>
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.fancytree/2.29.1/jquery.fancytree-all-deps.min.js" integrity="sha256-3BzqUr2z3WZbUjDICCG6tYtxE6U6PWcdz7c4QSXVSOo=" crossorigin="anonymous"></script>
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.18.0/axios.min.js" integrity="sha256-mpnrJ5DpEZZkwkE1ZgkEQQJW/46CSEh/STrZKOB/qoM=" crossorigin="anonymous"></script>
+
+		<!--Кусок блока с информацией-->
+		<script type="text/x-template" id="blck_info">
+			<div class="row">
+				<div class="col-12">
+					{{info}}
+				</div>
+			</div>
+		</script>
+		<!--END-->
+
+		<!--html шаблоны блока пользователи-->
+		<script type="text/x-template" id="user_info">
+			<div class="row">
+				<div class="col-12">
+					{{info}}
+				</div>
+			</div>
+		</script>
+
+		<script type="text/x-template" id="user_node">
+			<div class="row">
+				<div class="col-12">
+					
+					<div class="form-group form-inline" v-for="node in current">
+						<input type="checkbox" class="col-1" v-model="node.check">
+						<label class="col-2 col-form-label">{{node.node}}</label>
+	    				<select class="form-control col-9" v-model="node.grnt">
+							<option value="">nothing</option>
+				    		<option value="access">access</option>
+				    		<option value="delete">delete</option>
+				    		<option value="replace">replace</option>
+				    		<option value="insert">insert</option>
+				    		<option value="update">update</option>
+				    		<option value="read">read</option>
+				    		<option value="pass">pass</option>
+				    	</select>
+	  				</div>
+
+					<div class="form-group">
+	    				<select class="form-control" @change='add_node' v-model="nde">
+							<option disabled value="" selected>Добавить узел</option>
+				    		<option v-for="node in list">{{node}}</option>
+				    	</select>
+	  				</div>
+	  					
+					<button type="button" class="btn btn-default btn-block" @click="grants">Изменить права для отмеченных узлов</button>
+
+					<div class="col-12">{{message}}</div>
+				</div>
+			</div>
+		</script>
+
+		<script type="text/x-template" id="user_role">
+			<div class="row">
+				<div class="col-4" v-for="role in current">
+					<div class="form-group form-inline">
+						<label class="col-10 col-form-label">{{role.role}}</label>
+						<input type="checkbox" class="col-2" v-model="role.check">
+	  				</div>
+				</div>
+				<div class="col-12">
+					<div class="form-group">
+		    			<select class="form-control" @change='change' v-model="role">
+							<option disabled value="" selected>Add role</option>
+					    	<option v-for="role in list">{{role}}</option>
+					    </select>
+		  			</div>
+
+					<button type="button" class="btn btn-default btn-block" @click="finish">Оставить пользоватеелю отмеченные роли</button>
+
+		  			<div class="col-12">{{message}}</div>
+				</div>
+			</div>
+		</script>
+
+		<script type="text/x-template" id="user_remove">
+			<div class="row">
+				<div class="col-12">
+					<p>Данная операция удалит пользователя {{node.title}}</p>
+					<button type="button" class="btn btn-primary btn-block" @click="delete_user">Да, я хочу удалить роль</button>
+					<p>{{message}}</p>
+				</div>
+			</div>
+		</script>
+
+		<script type="text/x-template" id="user_add">
+			<div class="row">
+				<div class="col-12">
+					<form>
+						<div class="form-group">
+					    	<label>Имя нового пользователя</label>
+					    	<input type="text" class="form-control" v-model="user_name">
+					  	</div>
+					</form>
+
+					<button type="button" class="btn btn-default btn-block" @click="add_user">Создать роль</button>
+					<p>{{message}}</p>
+				</div>
+			</div>
+		</script>
+
+		<script type="text/x-template" id="blck_user">
+			<div class="row">
+				<div class="col-4" id="users"></div>
+				<div class="col-8">
+					
+					<div class="btn-group d-flex mb-2" role="group" aria-label="Basic example">
+						<button type="button" class="btn btn-primary w-100" v-if="show_btn" @click="f_current_component('info')">info</button>
+						<button type="button" class="btn btn-primary w-100" v-if="show_btn" @click="f_current_component('add')">add</button>
+						<button type="button" class="btn btn-primary w-100" v-if="show_btn" @click="f_current_component('remove')">remove</button>
+						<button type="button" class="btn btn-primary w-100" v-if="show_btn" @click="f_current_component('role')">role</button>
+						<button type="button" class="btn btn-primary w-100" v-if="show_btn" @click="f_current_component('node')">node</button>
+						<button type="button" class="btn btn-primary w-100" v-if="show_btn">update</button>
+					</div>
+					<keep-alive>
+  						<component v-bind:is="currentComponent" :info="user_info" :user="user" :rootNode="rootNode" :node="node" v-if="info"></component>
+					</keep-alive>
+				</div>
+			</div>
+		</script>
+		<!--END-->
+
+		<!--html шаблоны блока роли-->
+		<script type="text/x-template" id="role_info">
+			<div class="row">
+				<div class="col-12">
+					{{info}}
+				</div>
+			</div>
+		</script>
+
+		<script type="text/x-template" id="role_remuser">
+			<div class="row">
+				<div class="col-4" v-for="user in current">
+					<div class="form-group form-inline">
+						<label class="col-10 col-form-label">{{user.user}}</label>
+						<input type="checkbox" class="col-2" v-model="user.check">
+	  				</div>
+				</div>
+				<div class="col-12">
+					<button type="button" class="btn btn-default btn-block" @click="remuser">Remove users</button>
+
+		  			<div class="col-12">{{message}}</div>
+				</div>
+			</div>
+		</script>
+
+		<script type="text/x-template" id="role_adduser">
+			<div class="row">
+				<div class="col-4" v-for="user in current">
+					<div class="form-group form-inline">
+						<label class="col-10 col-form-label">{{user.user}}</label>
+						<input type="checkbox" class="col-2" v-model="user.check">
+	  				</div>
+				</div>
+
+				<div class="col-12">
+					<div class="form-group">
+		    			<select class="form-control" @change='add_user' v-model="usr">
+							<option disabled value="" selected>Добавить пользователя</option>
+					    	<option v-for="user in list">{{user}}</option>
+					    </select>
+		  			</div>
+
+		  			<button type="button" class="btn btn-default btn-block" @click="adduser">Add users</button>
+
+		  			<div class="col-12">{{message}}</div>
+		  		</div>
+			</div>
+		</script>
+
+		<script type="text/x-template" id="role_manager">
+			<div class="row">
+				
+				<div class="col-4" v-for="user in current">
+					<div class="form-group form-inline">
+						<label class="col-10 col-form-label">{{user.user}}</label>
+						<input type="checkbox" class="col-2" v-model="user.check">
+	  				</div>
+				</div>
+
+				<div class="col-12">
+					<div class="form-group">
+		    			<select class="form-control" @change='add_user' v-model="usr">
+							<option disabled value="" selected>Добавить пользователя</option>
+					    	<option v-for="user in list">{{user}}</option>
+					    </select>
+		  			</div>
+
+		  			<button type="button" class="btn btn-default btn-block" @click="manager">УРА!!!</button>
+
+		  			<div class="col-12">{{message}}</div>
+		  		</div>
+
+			</div>
+		</script>
+
+		<script type="text/x-template" id="role_node">
+			<div class="row">
+				<div class="col-12">
+					
+					<div class="form-group form-inline" v-for="node in current">
+						<input type="checkbox" class="col-1" v-model="node.check">
+						<label class="col-2 col-form-label">{{node.node}}</label>
+	    				<select class="form-control col-9" v-model="node.grnt">
+							<option value="">nothing</option>
+				    		<option value="access">access</option>
+				    		<option value="delete">delete</option>
+				    		<option value="replace">replace</option>
+				    		<option value="insert">insert</option>
+				    		<option value="update">update</option>
+				    		<option value="read">read</option>
+				    		<option value="pass">pass</option>
+				    	</select>
+	  				</div>
+
+					<div class="form-group">
+	    				<select class="form-control" @change='add_node' v-model="nde">
+							<option disabled value="" selected>Добавить узел</option>
+				    		<option v-for="node in list">{{node}}</option>
+				    	</select>
+	  				</div>
+	  					
+					<button type="button" class="btn btn-default btn-block" @click="grants">Изменить права для отмеченных узлов</button>
+
+					<div class="col-12">{{message}}</div>
+				</div>
+			</div>
+		</script>
+
+		<script type="text/x-template" id="role_remove">
+			<div class="row">
+				<div class="col-12">
+					<p>Данная операция удалит узел {{node.title}}</p>
+					<button type="button" class="btn btn-primary btn-block" @click="delete_role">Да, я хочу удалить роль</button>
+					<p>{{message}}</p>
+				</div>
+			</div>
+		</script>
+
+		<script type="text/x-template" id="role_add">
+			<div class="row">
+				<div class="col-12">
+					<form>
+						<div class="form-group">
+					    	<label>Имя новой роли</label>
+					    	<input type="text" class="form-control" v-model="role">
+					  	</div>
+					</form>
+
+					<div class="form-group">
+	    				<select class="form-control" v-model="manager">
+							<option disabled value="" selected>Укажите менеджера, если необходимо</option>
+				      		<option v-for="user in list">{{user}}</option>
+				    	</select>
+	  				</div>
+
+					<button type="button" class="btn btn-default btn-block" @click="add_role">Создать роль</button>
+					<p>{{message}}</p>
+				</div>
+			</div>
+		</script>
+
+		<script type="text/x-template" id="blck_role">
+			<div class="row">
+				<div class="col-4" id="roles"></div>
+				<div class="col-8">
+					
+					<div class="btn-group d-flex mb-2" role="group" aria-label="Basic example">
+						<button type="button" class="btn btn-primary w-100" v-if="show_btn" @click="f_current_component('info')">info</button>
+						<button type="button" class="btn btn-primary w-100" v-if="admin && show_btn" @click="f_current_component('add')">add</button>
+						<button type="button" class="btn btn-primary w-100" v-if="admin && show_btn" @click="f_current_component('remove')">remove</button>
+						<button type="button" class="btn btn-primary w-100" v-if="admin && show_btn" @click="f_current_component('node')">node</button>
+						<button type="button" class="btn btn-primary w-100" v-if="show_btn" @click="f_current_component('manager')">manager</button>
+						<button type="button" class="btn btn-primary w-100" v-if="show_btn" @click="f_current_component('adduser')">add user</button>
+						<button type="button" class="btn btn-primary w-100" v-if="show_btn" @click="f_current_component('remuser')">rem user</button>
+						<button type="button" class="btn btn-primary w-100" v-if="show_btn">update</button>
+					</div>
+					<keep-alive>
+  						<component v-bind:is="currentComponent" :info="role_info" :user="user" :rootNode="rootNode" :node="node" v-if="info"></component>
+					</keep-alive>
+				</div>
+			</div>
+		</script>
+		<!--END-->
+
+		<!--html шаблоны блока узлы-->
+		<script type="text/x-template" id="node_update">
+			<div class="row">
+				<div class="col-12">
+					<p v-if="info.err">{{info.err}}</p>
+					<div v-else>
+						<h4 class="text-center">{{node.title}}</h4>
+						<form>
+						  	<div class="form-group">
+						    	<label>comment</label>
+						    	<input type="text" class="form-control" v-model="comment">
+						  	</div>
+						  	<div class="form-group">
+						    	<label>password</label>
+						    	<input type="text" class="form-control" v-model="password">
+						  	</div>
+						  	<div class="form-group">
+						    	<label>email</label>
+						    	<input type="text" class="form-control" v-model="email">
+						  	</div>
+						  	<div class="form-group">
+						    	<label>url</label>
+						    	<input type="text" class="form-control" v-model="url">
+						  	</div>
+						  	<div class="form-group">
+						    	<label>files</label>
+						    	<input type="text" class="form-control" v-model="files">
+						  	</div>
+						</form>
+						<button type="button" class="btn btn-default btn-block" @click="update">Обновить</button>
+						<p>{{message}}</p>
+					</div>	
+				</div>
+			</div>
+		</script>
+
+		<script type="text/x-template" id="node_info">
+			<div class="row">
+				<div class="col-12">
+					<p v-if="info.err">{{info.err}}</p>
+					<div v-else>
+						<h4 class="text-center">{{node.title}}</h4>
+						<form>
+							<fieldset disabled>
+							  	<div class="form-group">
+							    	<label>comment</label>
+							    	<input type="text" class="form-control" v-model="comment">
+							  	</div>
+							  	<div class="form-group">
+							    	<label>password</label>
+							    	<input type="text" class="form-control" v-model="password">
+							  	</div>
+							  	<div class="form-group">
+							    	<label>email</label>
+							    	<input type="text" class="form-control" v-model="email">
+							  	</div>
+							  	<div class="form-group">
+							    	<label>url</label>
+							    	<input type="text" class="form-control" v-model="url">
+							  	</div>
+							  	<div class="form-group">
+							    	<label>files</label>
+							    	<input type="text" class="form-control" v-model="files">
+							  	</div>
+						  	</fieldset>
+						</form>
+					</div>	
+				</div>
+			</div>
+		</script>
+
+		<script type="text/x-template" id="node_access">
+			<div class="row">
+				<div class="col-12">
+
+					
+					<div class="btn-group d-flex mb-2" role="group" aria-label="Basic example">
+						<button type="button" class="btn btn-default w-100" @click="show('users')">users</button>
+						<button type="button" class="btn btn-default w-100" @click="show('roles')">roles</button>
+					</div>
+
+					<div v-show="show_u">
+						<div class="form-group form-inline" v-for="user in u_list">
+							<input type="checkbox" class="col-1" v-model="user.check">
+							<label class="col-2 col-form-label">{{user.user}}</label>
+	    					<select class="form-control col-9" v-model="user.grnt">
+								<option value="">nothing</option>
+				      			<option value="access">access</option>
+				      			<option value="delete">delete</option>
+				      			<option value="replace">replace</option>
+				      			<option value="insert">insert</option>
+				      			<option value="update">update</option>
+				      			<option value="read">read</option>
+				      			<option value="pass">pass</option>
+				    		</select>
+	  					</div>
+
+						<div class="form-group">
+	    					<select class="form-control" @change='add_user' v-model="usr">
+								<option disabled value="" selected>Выберите пользователя</option>
+				      			<option v-for="user in a_u_lst">{{user}}</option>
+				    		</select>
+	  					</div>
+	  					
+						<button type="button" class="btn btn-default btn-block" @click="test_u">Изменить права отмеченных пользователей</button>
+
+						<div class="col-12">{{msg_u}}</div>
+					</div>
+
+					<div v-show="show_r">
+						<div class="form-group form-inline" v-for="role in r_list">
+							<input type="checkbox" class="col-1" v-model="role.check">
+							<label class="col-2 col-form-label">{{role.role}}</label>
+	    					<select class="form-control col-9" v-model="role.grnt">
+								<option value="">nothing</option>
+				      			<option value="access">access</option>
+				      			<option value="delete">delete</option>
+				      			<option value="replace">replace</option>
+				      			<option value="insert">insert</option>
+				      			<option value="update">update</option>
+				      			<option value="read">read</option>
+				      			<option value="pass">pass</option>
+				    		</select>
+	  					</div>
+
+						<div class="form-group">
+	    					<select class="form-control" @change='add_role' v-model="rls">
+								<option disabled value="" selected>Выберите роль</option>
+				      			<option v-for="role in a_r_lst">{{role}}</option>
+				    		</select>
+	  					</div>
+	  					
+						<button type="button" class="btn btn-default btn-block" @click="test_r">Изменить права отмеченных ролей</button>
+
+						<div class="col-12">{{msg_r}}</div>
+					</div>
+				</div>
+			</div>
+		</script>
+
+		<script type="text/x-template" id="node_replace">
+			<div class="row">
+				<div class="col-12">
+					<form>
+  						<div class="form-group">
+						    <label for="formGroupExampleInput">Enter new parent</label>
+						    <input type="text" class="form-control" id="formGroupExampleInput" v-model="new_prnt">
+						</div>
+
+						<div id="#replace_tree"></div>
+
+						<button type="button" class="btn btn-default btn-block" @click="replace">REPLACE</button>
+						<p>{{message}}</p>
+					</form>
+				</div>
+			</div>
+		</script>
+
+		<script type="text/x-template" id="node_delete">
+			<div class="row">
+				<div class="col-12">
+					<p>Данная операция удалит узел {{tree.title}} и все его дочерние узлы</p>
+					<button type="button" class="btn btn-primary btn-block" @click="delete_node">Да, я хочу удалить узел </button>
+					<p>{{message}}</p>
+				</div>
+			</div>
+		</script>
+
+		<script type="text/x-template" id="node_insert">
+			<div class="row">
+				<div class="col-12">
+					<form>
+  						<div class="form-group">
+						    <label for="formGroupExampleInput">Введите имя нового узла</label>
+						    <input type="text" class="form-control" id="formGroupExampleInput" v-model="child">
+						</div>
+
+						<button type="button" class="btn btn-default btn-block" @click="insert">Добавит новый узел</button>
+						<p>{{message}}</p>
+					</form>
+				</div>
+			</div>
+		</script>
+
+		<script type="text/x-template" id="blck_node">
+			<div class="row">
+				<div class="col-4">
+					<div id="tree"></div>
+				</div>
+				<div class="col-8">
+					<div class="btn-group d-flex mb-2" role="group" aria-label="Basic example">
+						<button type="button" class="btn btn-primary w-100" v-if="f_show_node_btn('read')" @click="f_current_component('info')">info</button>
+						<button type="button" class="btn btn-primary w-100" v-if="f_show_node_btn('insert')" @click="f_current_component('insert')">insert</button>
+						<button type="button" class="btn btn-primary w-100" v-if="f_show_node_btn('replace')" @click="f_current_component('replace')">replace</button>
+						<button type="button" class="btn btn-primary w-100" v-if="f_show_node_btn('access')" @click="f_current_component('access')">access</button>
+						<button type="button" class="btn btn-primary w-100" v-if="f_show_node_btn('update')" @click="f_current_component('update')">update</button>
+						<button type="button" class="btn btn-primary w-100" v-if="f_show_node_btn('delete')" @click="f_current_component('delete')">delete</button>
+					</div>
+					<keep-alive>
+  						<component v-bind:is="currentComponent" :info="info" :tree="tree" :user="user" :node="node" v-if="info"></component>
+					</keep-alive>
+				</div>
+			</div>
+		</script>
+		<!--html шаблоны блока пользователи-->
+
+		<!--Мои файлы скриптов по блокам-->		
+		<script type="text/javascript" src="/static/c_node.js"></script>
+		<script type="text/javascript" src="/static/c_role.js"></script>
+		<script type="text/javascript" src="/static/c_users.js"></script>
+
+		<script type="text/javascript">
+			$(document).ready( function(){
+				
+				//Заготовка блока информация, в дальнейшем будет в отдельном файле
+				Vue.component('blck_info', {
+					template: '#blck_info',
+					props: ['info']
+				});
+
+				//основное приложение vue
+				var app = new Vue({
+					el: '#main',
+					data: {
+						user_list: {},
+						user_id: '',
+						user_info: {},
+						user_name: '',
+						node_info: {},
+						node_name: '',
+						check_tree: false,
+						check_role: false,
+						check_user: false,
+						check_info: false,
+						blck_info: false,
+						blck_node: true,
+						blck_role: false,
+						currentBlck: 'blck_node'
+					},
+					
+					mounted: function(){
+						axios.get('/am/base/user').then(response => (this.user_list = response.data));
+					},
+
+					watch:{
+						user_id: function(){
+							this.check_role = false;
+							this.check_user = false;
+							this.blck_info = false;
+							this.blck_node = true;
+							this.blck_role = false;
+						}
+					},
+					
+					methods:{
+
+						blck_show: function(str){
+							
+							var tmp = ['user','role','node','info'];
+							this.currentBlck = 'blck_'+str;
+						},
+
+						get_user: function(q){
+							
+							this.node_name = '';
+							this.node_info = {};
+							this.blck_show('node');
+
+							for ( var i=0; i<this.user_list.length; i++ ){
+								if ( this.user_list[i].id == this.user_id ){
+									this.user_name = this.user_list[i].user;
+								}
+							}
+
+							axios.get('/am/user/get', { params: { id: this.user_id, user: this.user_name } } )
+							.then(response => { 
+									
+									this.user_info = response.data;
+
+									if ( this.user_info.manager.length > 0 || ( this.user_info.roles[0] && this.user_info.roles.indexOf('admins') != -1 )){
+										this.check_role = true;
+									}
+
+									if ( this.user_info.roles[0] && this.user_info.roles.indexOf('admins') != -1 ){
+										this.check_user = true;
+									}
+								}
+							);
+							this.check_info = true;
+							this.check_tree = true;
+						},
+					}
+				})
+			});
+		</script>
+	</body>
+</html>

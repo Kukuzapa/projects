@@ -1,0 +1,2 @@
+5 * * * * cd /home/user/regformat_2_1/getdata && ./getdata >> /home/user/regformat_2_1/getdata/logs/getdata.log 2>&1
+10 * * * * cd /home/user/regformat_2_1/getdata && run-one /usr/local/openresty/bin/resty stop.lua >> /home/user/regformat_2_1/getdata/logs/stop.log 2>&1

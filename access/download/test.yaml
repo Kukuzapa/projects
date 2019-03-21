@@ -1,0 +1,697 @@
+openapi: 3.0.0
+info:
+  title: ТЦИ АПИ 2
+  description: обмен данными с реестром(тестовым)
+  version: '2.1'
+servers:
+  - url: 'http://84.38.3.34:8080/api/v2.1'
+    variables:
+      user:
+        default: user
+paths:
+  /front:
+    get:
+      summary: Веб-интерфейс
+      tags:
+        - Front
+      responses:
+        '200':
+          description: OK
+  /front2:
+    get:
+      summary: Веб-интерфейс
+      tags:
+        - Front
+      responses:
+        '200':
+          description: OK
+  /cron:
+    get:
+      summary: Запуск крона
+      tags:
+        - Cron
+      responses:
+        '200':
+          description: OK
+  '/registrar/get/{tld}':
+    get:
+      summary: Информация о регистраторе (?)
+      parameters:
+        - $ref: '#/components/parameters/tld_req'
+      tags:
+        - Registrar
+      responses:
+        '200':
+          description: OK
+  '/registrar/update/{tld}':
+    post:
+      summary: Добавляем/убираем ip адреса регистратора (?)
+      parameters:
+        - $ref: '#/components/parameters/tld_req'
+      tags:
+        - Registrar
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/registrar_update_req'
+      responses:
+        '200':
+          description: OK
+  '/registrar/poll/{tld}':
+    get:
+      summary: Получение сообщений реестра (?)
+      parameters:
+        - $ref: '#/components/parameters/tld_req'
+      tags:
+        - Registrar
+      responses:
+        '200':
+          description: OK
+  '/registrar/hello/{tld}':
+    get:
+      summary: Команда проверки связи
+      parameters:
+        - $ref: '#/components/parameters/tld_req'
+      tags:
+        - Registrar
+      responses:
+        '200':
+          description: OK
+  '/registrar/password/{tld}':
+    post:
+      summary: Замена пароля регистратора на вход
+      parameters:
+        - $ref: '#/components/parameters/tld_req'
+        - $ref: '#/components/parameters/NewPass_req'
+      tags:
+        - Registrar
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/registrar_set_pass_req'
+      responses:
+        '200':
+          description: OK
+  '/registrar/stat/{tld}':
+    get:
+      summary: Статистика
+      parameters:
+        - $ref: '#/components/parameters/tld_req'
+        - in: query
+          name: object
+          schema:
+            type: string
+        - in: query
+          name: pending
+          schema:
+            type: string
+      tags:
+        - Registrar
+      responses:
+        '200':
+          description: OK
+  '/registrar/limits/{tld}':
+    get:
+      summary: Лимиты
+      parameters:
+        - $ref: '#/components/parameters/tld_req'
+      tags:
+        - Registrar
+      responses:
+        '200':
+          description: OK
+  '/registrar/billing/{tld}':
+    get:
+      summary: Биллинг
+      parameters:
+        - $ref: '#/components/parameters/tld_req'
+        - in: query
+          name: billing
+          schema:
+            type: string
+        - in: query
+          name: currency
+          schema:
+            type: string
+        - in: query
+          name: date
+          schema:
+            type: string
+        - in: query
+          name: period
+          schema:
+            type: string
+      tags:
+        - Registrar
+      responses:
+        '200':
+          description: OK
+  /domain/create:
+    post:
+      summary: Создаем домен
+      tags:
+        - Domain
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/domain_create_req'
+      responses:
+        '200':
+          description: OK
+  /domain/get:
+    get:
+      summary: Информация о домене (?)
+      tags:
+        - Domain
+      parameters:
+        - $ref: '#/components/parameters/domain_name_req'
+        - $ref: '#/components/parameters/CDH_info_authInfo_req'
+      responses:
+        '200':
+          description: Успех
+  /domain/check:
+    get:
+      summary: Проверяем занятьсть имени (?)
+      tags:
+        - Domain
+      parameters:
+        - $ref: '#/components/parameters/domain_name_req'
+      responses:
+        '200':
+          description: Успех
+  /domain/delete:
+    post:
+      summary: Удаляем домен
+      tags:
+        - Domain
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/domain_delete_req'
+      responses:
+        '200':
+          description: OK
+  /domain/update:
+    post:
+      summary: Обновление домена
+      tags:
+        - Domain
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/domain_update_req'
+      responses:
+        '200':
+          description: OK
+  /domain/renew:
+    post:
+      summary: Продление домена
+      tags:
+        - Domain
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/domain_renew_req'
+      responses:
+        '200':
+          description: OK
+  '/domain/transfer/{transfer}':
+    post:
+      summary: Передача домена
+      parameters:
+        - $ref: '#/components/parameters/transfer_req'
+      tags:
+        - Domain
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/domain_transfer_req'
+      responses:
+        '200':
+          description: OK
+  /domain/copy:
+    get:
+      summary: Обновление данных из реестра (?!)
+      tags:
+        - Domain
+      parameters:
+        - $ref: '#/components/parameters/domain_name_req'
+        - $ref: '#/components/parameters/CDH_info_authInfo_req'
+      responses:
+        '200':
+          description: Успех
+  '/contact/get/{tld}':
+    get:
+      summary: Информация о контакте (?)
+      tags:
+        - Contact
+      parameters:
+        - $ref: '#/components/parameters/tld_req'
+        - $ref: '#/components/parameters/contact_id_req'
+        - $ref: '#/components/parameters/CDH_info_authInfo_req'
+      responses:
+        '200':
+          description: Успех
+  '/contact/check/{tld}':
+    get:
+      summary: Проверяем занятьсть ID (?)
+      tags:
+        - Contact
+      parameters:
+        - $ref: '#/components/parameters/tld_req'
+        - $ref: '#/components/parameters/contact_id_req'
+      responses:
+        '200':
+          description: Успех
+  '/contact/delete/{tld}':
+    post:
+      summary: Удаляем contact (?)
+      tags:
+        - Contact
+      parameters:
+        - $ref: '#/components/parameters/tld_req'
+        - $ref: '#/components/parameters/contact_id_req'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/contact_delete_req'
+      responses:
+        '200':
+          description: OK
+  '/contact/create/{tld}':
+    post:
+      summary: Create contact person
+      tags:
+        - Contact
+      parameters:
+        - $ref: '#/components/parameters/tld_req'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/contact_create_req'
+      responses:
+        '200':
+          description: OK
+  '/contact/update/{tld}':
+    post:
+      summary: Update contact person
+      parameters:
+        - $ref: '#/components/parameters/tld_req'
+      tags:
+        - Contact
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/contact_update_req'
+      responses:
+        '200':
+          description: OK
+  '/contact/copy/{tld}':
+    get:
+      summary: Обновление данных из реестра (?!)
+      tags:
+        - Contact
+      parameters:
+        - $ref: '#/components/parameters/tld_req'
+        - $ref: '#/components/parameters/contact_id_req'
+        - $ref: '#/components/parameters/CDH_info_authInfo_req'
+      responses:
+        '200':
+          description: Успех
+components:
+  parameters:
+    transfer_req:
+      name: transfer
+      in: path
+      required: true
+      schema:
+        $ref: '#/components/schemas/transfer'
+    curExpDate_req:
+      name: curExpDate
+      in: query
+      required: true
+      schema:
+        $ref: '#/components/schemas/curExpDate'
+    domain_name_req:
+      name: name
+      in: query
+      schema:
+        oneOf:
+          - $ref: '#/components/schemas/domain_name_ru'
+          - $ref: '#/components/schemas/domain_name_rf'
+    tld_req:
+      name: tld
+      in: path
+      required: true
+      schema:
+        $ref: '#/components/schemas/tld'
+    contact_id_req:
+      name: id
+      in: query
+      required: true
+      schema:
+        $ref: '#/components/schemas/contact_id'
+    CDH_info_authInfo_req:
+      name: authInfo
+      in: query
+      schema:
+        $ref: '#/components/schemas/authinfo'
+    NewPass_req:
+      name: newPass
+      in: query
+      schema:
+        $ref: '#/components/schemas/registrar_set_pass_req'
+  schemas:
+    transfer:
+      type: string
+      enum:
+        - request
+        - approve
+        - reject
+        - cancel
+        - ok
+    curExpDate:
+      type: string
+      format: date
+    tld:
+      type: string
+      enum:
+        - ru
+        - rf
+      default: ru
+    host_name:
+      type: string
+      pattern: '^(?!:\/\/)([a-zA-Z0-9-_]+\.)*[a-zA-Z0-9][a-zA-Z0-9-_]+\.(ru|RU|Ru|rU)?$'
+      minLength: 1
+      maxLength: 255
+    domain_name_ru:
+      type: string
+      pattern: '^[a-z0-9][a-z0-9-]{0,61}[a-z0-9]\.(ru)$'
+      minLength: 1
+      maxLength: 255
+    domain_name_rf:
+      type: string
+      pattern: '^[а-я0-9][а-я0-9-]{0,61}[а-я0-9]\.(рф)$'
+      minLength: 1
+      maxLength: 255
+    contact_id:
+      type: string
+      pattern: '^[a-zA-Z0-9-\\_]+$'
+      minLength: 3
+      maxLength: 32
+    ip:
+      oneOf:
+        - $ref: '#/components/schemas/v4'
+        - $ref: '#/components/schemas/v6'
+    bool:
+      type: boolean
+    v6:
+      type: string
+      pattern: '^(?:[0-9a-fA-F]{1,4}:){7}[0-9a-fA-F]{1,4}$'
+    v4:
+      type: string
+      pattern: >-
+        ^((\d|[1-9]\d|2[0-4]\d|25[0-5]|1\d\d)(?:\.(\d|[1-9]\d|2[0-4]\d|25[0-5]|1\d\d)){3})$
+    taxpayerNumbers:
+      type: string
+      pattern: '^[0-9]{0,27}$'
+      minLength: 0
+      maxLength: 27
+    authinfo:
+      type: string
+      pattern: '^((?!##)(?!<)(?!>)(?![а-яА-ЯёЁ]).)+$'
+      minLength: 6
+      maxLength: 32
+    voice:
+      type: string
+      pattern: '^[\d +()#-]+(\(transfer\)|\(sms\)){0,1}$'
+      minLength: 1
+      maxLength: 255
+    fax:
+      type: string
+      pattern: '^[\d +()#-]+$'
+      minLength: 1
+      maxLength: 255
+    email:
+      type: string
+      pattern: >-
+        ^[a-zA-Z0-9.!#$%&’*+\=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*(\(transfer\)){0,1}$
+      minLength: 1
+      maxLength: 255
+    LPI_name:
+      type: string
+      pattern: '^[а-яА-ЯёЁa-zA-Z0-9 -.'']+$'
+      minLength: 1
+      maxLength: 255
+    LPI_address:
+      type: string
+      pattern: '^[а-яА-ЯёЁa-zA-Z0-9]((?!##)(?!<)(?!>).)+$'
+      minLength: 1
+      maxLength: 510
+    LPI_org:
+      type: string
+      pattern: '^[а-яА-ЯёЁa-zA-Z0-9]((?!##)(?!<)(?!>).)+$'
+      minLength: 1
+      maxLength: 512
+    IPI_name:
+      type: string
+      pattern: '^[a-zA-Z0-9 -.'']+$'
+      minLength: 1
+      maxLength: 255
+    IPI_address:
+      type: string
+      pattern: '^[a-zA-Z0-9]((?!##)(?!<)(?!>).)+$'
+      minLength: 1
+      maxLength: 510
+    IPI_org:
+      type: string
+      pattern: '^[a-zA-Z0-9]((?!##)(?!<)(?!>).)+$'
+      minLength: 1
+      maxLength: 512
+    birthday:
+      type: string
+      pattern: '^([12]\d{3}-(0[1-9]|1[0-2])-(0[1-9]|[12]\d|3[01]))$'
+    passport:
+      type: string
+      pattern: '^((?!##)(?!<)(?!>).)+$'
+      minLength: 1
+      maxLength: 255
+    description:
+      type: string
+      pattern: '^[a-zA-Z0-9]((?!##)(?!<)(?!>).)+$'
+      minLength: 1
+      maxLength: 250
+    newPW:
+      type: string
+      minLength: 6
+      maxLength: 32
+      pattern: '^[\x00-\x7F]+$'
+    registrar_set_pass_req:
+      type: object
+      properties:
+        newPW:
+          $ref: '#/components/schemas/newPW'
+      required:
+        - newPW
+    contact_create_req:
+      type: object
+      properties:
+        birthday:
+          $ref: '#/components/schemas/birthday'
+        voice:
+          type: array
+          items:
+            $ref: '#/components/schemas/voice'
+          minItems: 1
+          maxItems: 15
+        email:
+          type: array
+          items:
+            $ref: '#/components/schemas/email'
+          minItems: 1
+          maxItems: 15
+        passport:
+          type: array
+          items:
+            $ref: '#/components/schemas/passport'
+          minItems: 1
+          maxItems: 15
+        int_name:
+          $ref: '#/components/schemas/IPI_name'
+        name:
+          $ref: '#/components/schemas/LPI_name'
+        address:
+          type: array
+          items:
+            $ref: '#/components/schemas/LPI_address'
+          minItems: 1
+          maxItems: 15
+        leg_address:
+          type: array
+          items:
+            $ref: '#/components/schemas/LPI_address'
+          minItems: 1
+          maxItems: 15
+        int_org:
+          $ref: '#/components/schemas/IPI_org'
+        org:
+          $ref: '#/components/schemas/LPI_org'
+        taxpayerNumbers:
+          $ref: '#/components/schemas/taxpayerNumbers'
+      required:
+        - voice
+        - email
+        - address
+    contact_update_req:
+      type: object
+      properties:
+        id:
+          $ref: '#/components/schemas/contact_id'
+        status:
+          type: array
+          items:
+            type: string
+            enum:
+              - clientUpdateProhibited
+              - clientDeleteProhibited
+              - clientTransferProhibited
+        birthday:
+          $ref: '#/components/schemas/birthday'
+        voice:
+          type: array
+          items:
+            $ref: '#/components/schemas/voice'
+          minItems: 1
+          maxItems: 15
+        email:
+          type: array
+          items:
+            $ref: '#/components/schemas/email'
+          minItems: 1
+          maxItems: 15
+        passport:
+          type: array
+          items:
+            $ref: '#/components/schemas/passport'
+          minItems: 1
+          maxItems: 15
+        int_name:
+          $ref: '#/components/schemas/IPI_name'
+        name:
+          $ref: '#/components/schemas/LPI_name'
+        address:
+          type: array
+          items:
+            $ref: '#/components/schemas/LPI_address'
+          minItems: 1
+          maxItems: 15
+        taxpayerNumbers:
+          $ref: '#/components/schemas/taxpayerNumbers'
+        org:
+          $ref: '#/components/schemas/LPI_org'
+        int_org:
+          $ref: '#/components/schemas/IPI_org'
+        leg_address:
+          type: array
+          items:
+            $ref: '#/components/schemas/LPI_address'
+          minItems: 1
+          maxItems: 15
+      required:
+        - id
+    domain_update_req:
+      type: object
+      properties:
+        name:
+          oneOf:
+            - $ref: '#/components/schemas/domain_name_ru'
+            - $ref: '#/components/schemas/domain_name_rf'
+        status:
+          type: array
+          items:
+            type: string
+            enum:
+              - clientUpdateProhibited
+              - clientTransferProhibited
+              - clientDeleteProhibited
+              - clientHold
+              - changeProhibited
+        description:
+          $ref: '#/components/schemas/description'
+        authInfo:
+          $ref: '#/components/schemas/authinfo'
+        registrant:
+          $ref: '#/components/schemas/contact_id'
+      required:
+        - name
+    domain_create_req:
+      type: object
+      properties:
+        name:
+          oneOf:
+            - $ref: '#/components/schemas/domain_name_ru'
+            - $ref: '#/components/schemas/domain_name_rf'
+        registrant:
+          $ref: '#/components/schemas/contact_id'
+        description:
+          $ref: '#/components/schemas/description'
+        authInfo:
+          $ref: '#/components/schemas/authinfo'
+      required:
+        - registrant
+        - name
+    domain_delete_req:
+      type: object
+      properties:
+        name:
+          oneOf:
+            - $ref: '#/components/schemas/domain_name_ru'
+            - $ref: '#/components/schemas/domain_name_rf'
+      required:
+        - name
+    domain_renew_req:
+      type: object
+      properties:
+        name:
+          oneOf:
+            - $ref: '#/components/schemas/domain_name_ru'
+            - $ref: '#/components/schemas/domain_name_rf'
+        curExpDate:
+          $ref: '#/components/schemas/curExpDate'
+    domain_transfer_req:
+      type: object
+      properties:
+        name:
+          oneOf:
+            - $ref: '#/components/schemas/domain_name_ru'
+            - $ref: '#/components/schemas/domain_name_rf'
+        authInfo:
+          $ref: '#/components/schemas/authinfo'
+    registrar_update_req:
+      type: object
+      properties:
+        ip:
+          type: array
+          items:
+            oneOf:
+              - $ref: '#/components/schemas/v4'
+              - $ref: '#/components/schemas/v6'
+          minItems: 1
+          maxItems: 20
+      required:
+        - ip
+    contact_delete_req:
+      type: object
+      properties:
+        id:
+          $ref: '#/components/schemas/contact_id'

@@ -1,0 +1,581 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+		
+		<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.0/css/bootstrap.min.css" integrity="sha384-9gVQ4dYFwwWSjIDZnLEWnxCjeSWFphJiwGPXr1jddIhOegiu1FwO5qRGvFXOdJZ4" crossorigin="anonymous">
+		
+		<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.8.0/css/bootstrap-datepicker3.standalone.min.css" integrity="sha256-2Te/Z7x8FzV1lOSTEj1s9PsKytIbmbXVNgjUj/2Ew8g=" crossorigin="anonymous">
+		
+		
+
+		<title>Погода Гет-Нэт</title>
+	</head>
+	<body>
+		<div class="container">
+		
+			<header class="row border-bottom">
+				<div class="col-12">
+					<h1 class="text-center">Погода</h1>
+				</div>
+			</header>	
+			<div class="row">
+				<aside class="col-3 border-right">
+					<p><a href="/" id="sen">Счетчики</a></p>
+					<p><a href="/variable" id="var">Переменные</a></p>
+					<p><a href="/archive" id="arc">Архив</a></p>
+					<p><a href="/graphs" id="grph">Графики</a></p>
+					<p><a href="/forecast" id="frcast">Прогноз</a></p>
+					<p><a href="/weather" id="weath">Погода</a></p>
+					<p><a href="/error" id="error">Работоспособность</a></p>
+				</aside>
+				<main class="col-9"></main>
+			</div>
+		</div>
+		
+	<script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.0/umd/popper.min.js" integrity="sha384-cs/chFZiN24E4KMATLdqdvsezGxaGsi4hLGOzlXwp5UZB1LY//20VyM2taTB4QvJ" crossorigin="anonymous"></script>
+	<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.0/js/bootstrap.min.js" integrity="sha384-uefMccjFJAIv6A+rW+L4AHf99KvxDjWSu1z9VI8SKNVmz4sk7buKt/6v9KI65qnm" crossorigin="anonymous"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/handlebars.js/4.0.11/handlebars.min.js"></script>
+	
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.8.0/js/bootstrap-datepicker.js" integrity="sha256-ncetQ5WcFxZU3YIwggfwOwmewLVX4SHLBtDYnrsxooY=" crossorigin="anonymous"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.8.0/locales/bootstrap-datepicker.ru.min.js" integrity="sha256-iGDUwn2IPSzlnLlVeCe3M4ZIxQxjUoDYdEO6oBZw/Go=" crossorigin="anonymous"></script>
+
+	<script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+
+	
+	
+	
+
+	<script id="sensor" type="text/x-handlebars-template">
+		<h5 class="text-center">SENSOR</h5>
+		{{#if err}}
+		<h3>ERROR</h3>
+  		<p>{{err}}</p>
+		{{else}}
+		<table class="table table-hover">
+			<thead>
+				<tr>
+					<th>Название Сенсора</th>
+					<th>Текущее значение</th>
+					<th>Минимальное значение</th>
+					<th>Максимальное значение</th>
+				</tr>
+			</thead>
+			<tbody>
+				{{#each .}}
+					{{#if this.name}}
+						{{#if this.dirvalue}}
+							<tr>
+								<td>{{this.name}}</td>
+								<td>{{this.value}}, {{this.dirvalue}}</td>
+								<td>{{this.min}}, {{this.dirmin}}</td>
+								<td>{{this.max}}, {{this.dirmax}}</td>
+							</tr>
+						{{else}}
+							<tr>
+								<td>{{this.name}}</td>
+								<td>{{this.value}}</td>
+								<td>{{this.min}}</td>
+								<td>{{this.max}}</td>
+							</tr>
+						{{/if}}
+					{{/if}}
+				{{/each}}
+			</tbody>
+		</table>
+		{{/if}}
+	</script>
+
+	<script id="variable" type="text/x-handlebars-template">
+		<h5 class="text-center">VARIABLE</h5>
+		{{#if err}}
+			<h3>ERROR</h3>
+  			<p>{{err}}</p>
+		{{else}}
+		<table class="table table-hover table-sm">
+			<thead>
+				<tr>
+					<th>Название Сенсора</th>
+					<th>Текущее значение</th>
+				</tr>
+			</thead>
+			<tbody>
+			{{#each .}}
+				{{#if this.name}}
+					<tr>
+						<td>{{this.name}}</td>
+						<td>{{this.value}}</td>
+					</tr>
+				{{/if}}
+			{{/each}}
+			</tbody>
+		</table>
+		{{/if}}
+	</script>
+
+	<script id="archive" type="text/x-handlebars-template">
+		<h5 class="text-center">ARCHIVE</h5>
+		<div class="row">
+			<div class="col-3">Дата</div>
+			<div class="col-3">Час</div>
+			<div class="col-3">Минута</div>
+			<div class="col-3"></div>
+		</div>
+		<form id="archive_form">
+			<div class="row">
+				<div class="form-group col-3">
+					<input type="text" class="datepicker form-control" id="date" placeholder="День">
+				</div>
+				<div class="form-group col-3">
+					<select class="form-control" id="hours">
+						<option>00</option>
+						<option>01</option>
+						<option>02</option>
+						<option>03</option>
+						<option>04</option>
+						<option>05</option>
+						<option>06</option>
+						<option>07</option>
+						<option>08</option>
+						<option>09</option>
+						<option>10</option>
+						<option>11</option>
+						<option>12</option>
+						<option>13</option>
+						<option>14</option>
+						<option>15</option>
+						<option>16</option>
+						<option>17</option>
+						<option>18</option>
+						<option>19</option>
+						<option>20</option>
+						<option>21</option>
+						<option>22</option>
+						<option>23</option>
+					</select>
+				</div>
+				<div class="form-group col-3">
+					<select class="form-control" id="minutes">
+						<option>00</option>
+						<option>05</option>
+						<option>10</option>
+						<option>15</option>
+						<option>20</option>
+						<option>25</option>
+						<option>30</option>
+						<option>35</option>
+						<option>40</option>
+						<option>45</option>
+						<option>50</option>
+						<option>55</option>
+					</select>
+				</div>
+				<div class="col-3 form-group">
+					<button type="submit" class="btn btn-default" id="btn_arc">Submit</button>
+				</div>
+			</div>
+		</form>
+	</script>
+
+	<script type="text/x-handlebars-template" id="arc_table">
+		{{#if err}}
+		<h3>ERROR</h3>
+  		<p>{{err}}</p>
+		{{else}}
+		<table class="table table-hover table-sm">
+			<thead>
+				<tr>
+					<th>Название</th>
+					<th>Значение</th>
+				</tr>
+			</thead>
+			<tbody>
+				{{#each .}}
+					{{#if this.name}}
+						{{#if this.dir}}
+							<tr>
+								<td>{{this.name}}</td>
+								<td>{{this.value}}, {{this.dir}}</td>
+							</tr>
+						{{else}}
+							<tr>
+								<td>{{this.name}}</td>
+								<td>{{this.value}}</td>
+							</tr>
+						{{/if}}
+					{{/if}}
+				{{/each}}
+			</tbody>
+		</table>
+		{{/if}}
+	</script>
+
+	<script type="text/x-handlebars-template" id="graphs">
+		<h5 class="text-center">STATISTICS</h5>
+		<form id="graphs_form">
+			<div class="row">
+				<div class="col-3 form-group">
+					<select class="form-control" id="graphs_sensor_1">
+						<option>temperature</option>
+						<option>temperature_apparent</option>
+						<option>wind_speed</option>
+						<option>wind_direction</option>
+						<option>wind_gust</option>
+						<option>precipitation</option>
+						<option>pressure</option>
+						<option>dew_point</option>
+						<option>humidity</option>
+						<option>exposure</option>
+						<option>exposure_ideal</option>
+						<option>agl</option>
+						<option>fog</option>
+						<option>sunrise</option>
+						<option>sunset</option>
+						<option>astroend</option>
+						<option>astrolen</option>
+						<option>astrostart</option>
+						<option>bio</option>
+						<option>civend</option>
+						<option>civlen</option>
+						<option>civstart</option>
+						<option>daylen</option>
+						<option>isday</option>
+						<option>moonphase</option>
+						<option>nautend</option>
+						<option>nautlen</option>
+						<option>nautstart</option>
+						<option>pressure_old</option>
+						<option>temperature_avg</option>
+					</select>	
+				</div>
+				<div class="col-3 form-group">
+					<select class="form-control" id="graphs_sensor_2">
+						<option>nothing</option>
+						<option>temperature</option>
+						<option>temperature_apparent</option>
+						<option>wind_speed</option>
+						<option>wind_direction</option>
+						<option>wind_gust</option>
+						<option>precipitation</option>
+						<option>pressure</option>
+						<option>dew_point</option>
+						<option>humidity</option>
+						<option>exposure</option>
+						<option>exposure_ideal</option>
+						<option>agl</option>
+						<option>fog</option>
+						<option>sunrise</option>
+						<option>sunset</option>
+						<option>astroend</option>
+						<option>astrolen</option>
+						<option>astrostart</option>
+						<option>bio</option>
+						<option>civend</option>
+						<option>civlen</option>
+						<option>civstart</option>
+						<option>daylen</option>
+						<option>isday</option>
+						<option>moonphase</option>
+						<option>nautend</option>
+						<option>nautlen</option>
+						<option>nautstart</option>
+						<option>pressure_old</option>
+						<option>temperature_avg</option>
+					</select>	
+				</div>
+				<div class="col-2 form-group">
+					<select class="form-control" id="graphs_step">
+						<option>1 минута</option>
+						<option>15 минут</option>
+						<option>30 минут</option>
+						<option>1 час</option>
+						<option>2 часа</option>
+						<option>4 часа</option>
+						<option>8 часов</option>
+						<option>16 часов</option>
+						<option>24 часа</option>
+					</select>
+				</div>
+				<div class="col-2 form-group">
+					<select class="form-control" id="graphs_period">
+						<option>С начала суток</option>
+						<option>За 24 часа</option>
+						<option>За три дня</option>
+						<option>За неделю</option>
+						<option>За месц</option>
+					</select>	
+				</div>
+				<div class="col-2 form-group">
+					<button type="submit" class="btn btn-default" id="btn_graphs">Submit</button>
+				</div>
+			</div>
+		</form>
+	</script>
+
+	<script type="text/x-handlebars-template" id="graphs_chart">
+		<div id="stat1"></div>
+	</script>
+
+	<script type="text/x-handlebars-template" id="forecast">
+		{{#each .}}
+			<h5 class="text-center">{{this.td}}</h5>
+			<table class="table table-hover table-sm">
+				<tbody>
+					<tr>
+						<td>Температура</td>
+						<td>{{this.temperature}}</td>
+					</tr>
+					<tr>
+						<td>Влажность</td>
+						<td>{{this.humidity}}</td>
+					</tr>
+					<tr>
+						<td>Давление</td>
+						<td>{{this.pressure}}</td>
+					</tr>
+					<tr>
+						<td>weather_icon</td>
+						<td>{{this.weather_icon}}</td>
+					</tr>
+					<tr>
+						<td>weather_id</td>
+						<td>{{this.weather_id}}</td>
+					</tr>
+				</tbody>
+			</table>
+		{{/each}}
+	</script>
+
+	<script type="text/x-handlebars-template" id="weather">
+		<h5 class="text-center">{{td}}</h5>
+		<table class="table table-hover table-sm">
+			<tbody>
+				<tr>
+					<td>Температура</td>
+					<td>{{temperature}}</td>
+				</tr>
+				<tr>
+					<td>Влажность</td>
+					<td>{{humidity}}</td>
+				</tr>
+				<tr>
+					<td>Давление</td>
+					<td>{{pressure}}</td>
+				</tr>
+				<tr>
+					<td>weather_icon</td>
+					<td>{{weather_icon}}</td>
+				</tr>
+				<tr>
+					<td>weather_id</td>
+					<td>{{weather_id}}</td>
+				</tr>
+			</tbody>
+		</table>
+	</script>
+
+	<script type="text/x-handlebars-template" id="err_templ">
+		<p>{{count}}</p>
+		<p>{{start}}</p>
+		<p>{{message}}</p>
+	</script>
+
+	<script type="text/javascript">
+		$(document).ready(function(){
+
+			var command = 'sensor'
+
+			$('#error').click(function(){
+				clearInterval(Interval);
+				
+				/*var templateScript = $('#err_templ').html();
+				var template = Handlebars.compile(templateScript);
+				$('main').html(template(values));*/
+				$.ajax({
+					url: '/status',
+					dataType: 'json',
+					success: function(values){
+						var templateScript = $('#err_templ').html();
+						var template = Handlebars.compile(templateScript);
+						$('main').html(template(values));
+					}
+				});
+				
+				return false;
+			})
+
+			$('#grph').click(function(){
+				graphs()
+				clearInterval(Interval);
+				return false
+			});
+
+			function graphs(body, per, stp){
+				$.ajax({
+					url: '/graphs',
+					data: body,
+					dataType: 'json',
+					success: function(values){
+						var templateScript = $('#graphs').html();
+						var template = Handlebars.compile(templateScript);
+						$('main').html(template(values));
+
+						if (body) {
+							
+							var templateScript = $('#graphs_chart').html();
+							var template = Handlebars.compile(templateScript);
+							$('main').append(template(values));
+
+							$('#graphs_sensor_1').val(body.sensor1);
+							$('#graphs_sensor_2').val(body.sensor2);
+							$('#graphs_period').val(per);
+							$('#graphs_step').val(stp)
+
+							google.charts.load('current', { 'packages': ['corechart'] });
+	    					google.charts.setOnLoadCallback(drawChart);
+
+   		 					function drawChart(str) {
+   		 						var grph = [['Time',body.sensor1,body.sensor2]];
+
+   		 						if ( body.sensor2 == 'nothing' ) {
+   		 							grph = [['Time',body.sensor1]];
+   		 						}
+
+   		 						for (i=0;i<values.length;i++) {
+   		 							grph[i+1] = values[i]; //alert(values[i][1]);
+   		 						}
+
+   		 						var options = {
+          							legend: {position: 'top', maxLines: 2}
+        						};
+
+     							var data = google.visualization.arrayToDataTable(grph);
+     							var chart = new google.visualization.AreaChart(document.getElementById('stat1'));
+      							chart.draw(data, options);
+    						}
+    					}
+
+    					$('#graphs_form').submit(function(){
+    						var period = {
+    							'С начала суток' : 0,
+    							'За 24 часа'     : 24,
+    							'За три дня'     : 72,
+    							'За неделю'      : 168,
+    							'За месц'        : 720
+    						}
+    						var step = {
+    							'1 минута' : 1,
+    							'15 минут' : 15,
+								'30 минут' : 30,
+								'1 час'    : 60,
+								'2 часа'   : 120,
+								'4 часа'   : 240,
+								'8 часов'  : 480,
+								'16 часов' : 960,
+								'24 часа'  : 1920
+    						}
+
+							var body = { sensor1: $('#graphs_sensor_1').val(), sensor2: $('#graphs_sensor_2').val(), period: period[$('#graphs_period').val()], step: step[$('#graphs_step').val()] }
+							graphs( body, $('#graphs_period').val(), $('#graphs_step').val() );
+							return false
+						})
+					}
+				})
+			}
+			
+			$('#arc').click(function(){
+				archive();
+				clearInterval(Interval);
+				return false;
+			});
+
+			$('#frcast').click(function(){
+				var command = 'forecast';
+				sensors_variables(command);
+				clearInterval(Interval);
+				return false;
+			});
+
+			function sensors_variables(str){
+				$.ajax({
+					url: '/'+str,
+					dataType: 'json',
+					success: function(values){
+						var templateScript = $('#'+str).html();
+						var template = Handlebars.compile(templateScript);
+						$('main').html(template(values));
+					}
+				}
+			)};
+
+			$('#weath').click(function(){
+				var command = 'weather';
+				sensors_variables(command);
+				clearInterval(Interval);
+				return false;
+			});
+
+			$('#var').click(function(){
+				var command = 'variable';
+				sensors_variables(command);
+				clearInterval(Interval);
+				Interval = setInterval(sensors_variables, 30000, command);
+				return false;
+			});
+
+			$('#sen').click(function(){
+				var command = 'sensor';
+				sensors_variables(command);
+				clearInterval(Interval);
+				Interval = setInterval(sensors_variables, 30000, command);
+				return false;
+			});
+
+			function archive(body){
+				$.ajax({
+
+					url: '/archive',
+					data: body,
+					dataType: 'json',
+					success: function(values){
+
+						var templateScript = $('#archive').html();
+						var template = Handlebars.compile(templateScript);
+						$('main').html(template(values));
+						
+						$('.datepicker').datepicker({
+							language: 'ru',
+							format: 'yyyy-mm-dd',
+						});
+						
+						if (body) {
+							var templateScript = $('#arc_table').html();
+							var template = Handlebars.compile(templateScript);
+							$('main').append(template(values));
+
+							$('.datepicker').val( body.date );
+							$('#hours').val( body.hours );
+							$('#minutes').val( body.minutes );
+						} else {
+							$('.datepicker').val( (new Date()).toISOString().substring(0, 10) );
+						}
+
+						$('#archive_form').submit(function(){
+							var body = { date: $('#date').val(), hours: $('#hours').val(), minutes: $('#minutes').val() }
+							archive(body);
+							return false
+						})
+					}
+				}
+			)};
+
+			sensors_variables(command);
+			
+			var Interval = setInterval(sensors_variables, 30000, command);
+		});
+	</script>
+
+	</body>
+</html>

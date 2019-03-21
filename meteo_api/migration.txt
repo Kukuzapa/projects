@@ -1,0 +1,19 @@
+Установка/перенос апи метео-станция.
+
+1. Клонировать репозиторий https://gitlab.get-net.ru/et/meteo
+2. Установить lapis, openresty, resty-http (via luarocks), redis, clickhouse (инструкция - https://clickhouse.yandex/docs/ru/getting_started/)
+3. Прописать в крон:
+   * * * * * /usr/local/openresty/bin/resty /home/ubuntu/mto/module/meteo_cron.lua >> /home/ubuntu/mto/module/error.log
+   */5 * * * * /usr/local/openresty/bin/resty /home/ubuntu/mto/module/openweather_cron.lua >> /home/ubuntu/mto/module/open.log
+4. Перенос данных из clickhouse.
+   В CH данные храняться в двух таблицах. Дампы структуры таблиц есть в файлах sensor.sql и variable.sql
+
+   clickhouse-client < table.sql - команда для импорта данных в чистый CH. table - название таблицы.
+
+   Перенос данных:
+   В командной строке, не заходя в CH
+
+   clickhouse-client --query="SELECT * FROM meteo.sensor FORMAT Native" > sensor[date].native - Дамп таблицы сенсоры
+   clickhouse-client --query="SELECT * FROM meteo.variable FORMAT Native" > variable[date].native - Дамп таблицы переменные
+
+   clickhouse-client --query="INSERT INTO meteo.[sensor|variable] FORMAT Native" < table.native - Экспорт данных в CH

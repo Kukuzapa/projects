@@ -1,0 +1,209 @@
+openapi: 3.0.0
+info:
+  title: SBIS
+  description: work with sbis api
+  version: '0.1'
+servers:
+  - url: 'https://sbis.gtn.ee'
+paths:
+  /queue:
+    post:
+      summary: добавление документа в очередь отправки
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/queue'
+      responses:
+        '200':
+          description: OK
+  /logs:
+    get:
+      summary: получение статуса ранее загруженных документов
+      parameters:
+        - in: query
+          name: doc_id
+          schema:
+            type: string
+          description: идентификатор документа
+        - in: query
+          name: b_date
+          schema:
+            type: string
+            format: date
+          description: начало периода  
+        - in: query
+          name: e_date
+          schema:
+            type: string
+            format: date
+          description: конец периода  
+        - in: query
+          name: status
+          schema:
+            type: string
+            enum:
+              - success
+              - error
+              - alert
+          description: статус документа  
+        - in: query
+          name: log
+          schema:
+            type: boolean
+          description: выгрузка всех документов обмена с сбис  
+      responses:
+        '200':
+          description: OK   
+  /remove:
+    post:
+      summary: внутренний запрос. удаляет из файлохранилища все документы старше часа, положенные туда сервисом
+      responses:
+        '200':
+          description: OK
+  /list:
+    get:
+      summary: реестр документов сбис
+      parameters:
+        - in: query
+          name: type_reg
+          required: true
+          schema:
+            type: string
+            enum:
+              - Входящие
+              - Отпраленные
+              - Ответы контрагента
+          description: тип реестра
+        - in: query
+          name: status
+          required: true
+          schema:
+            type: string
+          description: статус документа ( подробно в документации СБИС )
+        - in: query
+          name: date_from
+          schema:
+            type: string
+          description: начало периода в формате, требуемом СБИС
+        - in: query
+          name: date_to
+          schema:
+            type: string
+          description: конец периода в формате, требуемом СБИС
+        - in: query
+          name: type_selected
+          schema:
+            type: string
+          description: типы вложений. один или несколько через запяятую. ( подробно в документации СБИС )
+        - in: query
+          name: email
+          required: true
+          schema:
+            type: string
+          description: почтовый ящик пользователя, для проверки прав пользователя
+      responses:
+        '200':
+          description: OK   
+  /att:
+    get:
+      summary: информация о вложениях документа сбис
+      parameters:
+        - in: query
+          name: doc_id
+          required: true
+          schema:
+            type: string
+          description: идентификатор документа в СБИС
+        - in: query
+          name: email
+          required: true
+          schema:
+            type: string
+          description: почтовый ящик пользователя, для проверки прав пользователя
+      responses:
+        '200':
+          description: OK
+  /accrej:
+    post:
+      summary: отклонить/одобрить документ в СБИС
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/accrej'
+      responses:
+        '200':
+          description: OK
+  /massaccept:
+    post:
+      summary: одобрить массив документов в СБИС
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/massaccept'
+      responses:
+        '200':
+          description: OK
+components:
+  schemas:
+    massaccept:
+      type: object
+      additionalProperties:
+        type: string
+      minLength: 1
+      example:
+        en: Hello!
+        fr: Bonjour!
+    accrej:
+      type: object
+      properties:
+        doc:
+          description: идентификатор документа в сбис
+          type: string
+        lev:
+          description: идентификатор этапа обработки документа в сбис
+          type: string
+        com:
+          description: команда - название этапа
+          type: string
+          enum:
+            - Утвердить
+            - Отклонить
+        comment:
+          description: комментарий, необходим при операции Отклонить
+          type: string
+      required:
+        - doc
+        - lev
+        - com
+    queue:
+      type: object
+      properties:
+        inn:
+          description: инн клиента
+          type: string
+        kpp:
+          description: кпп клиента
+          type: string
+        type:
+          description: тип документа клиента
+          type: string
+        id:
+          description: идентификатор документа
+          type: string
+        file:
+          description: массив файлов для отправки
+          type: array
+          items:
+            type: string
+            format: binary
+          minItems: 1
+      required:
+        - inn
+        - kpp
+        - type
+        - id
+        - file
+    

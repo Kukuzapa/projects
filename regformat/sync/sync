@@ -1,0 +1,34 @@
+#!/bin/bash
+# This is a comment
+echo $0
+echo $1
+
+if [ $1 = ru ]
+then
+    echo 'this is ru'
+    L=REGFORMAT-WEB-RU
+    P=lnxebemz
+    Z=.ru
+elif [ $1 = rf ]
+then
+    echo 'this is rf'
+    L=REGFORMAT-WEB-RF
+    P=lnxebemz
+    Z=.xn--p1ai
+else
+    echo 'mistake'
+    exit 1
+fi
+
+F=Domainlist$(date +"%Y%m%d")
+
+echo $L,$P,$Z
+
+rm -f $F.$Z.txt.gz $F.$Z.txt
+curl --ciphers rsa_aes_128_sha -o $F.$Z.txt.gz "https://uapweb.tcinet.ru:8092/getstat_su?login=$L&passwd=$P&zone=$Z&file=$F"
+gunzip $F.$Z.txt.gz
+
+cat $F.$Z.txt | grep -E 'REGFORMAT-(RU|RF)' | awk '{print($1)}' | while read -r D; do
+        curl --user Kukuzapa:Ntntyjd1 http://localhost:8081/api/v2.1/sync/$1?domain=$D;
+        echo $D;
+done

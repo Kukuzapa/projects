@@ -1,0 +1,43 @@
+#!/bin/bash
+
+#pwd
+#* * * * * cd /home/kukuzapa/work/tests && ./getdata >> /home/kukuzapa/work/tests/getdata.log 2>&1
+
+zones=(ru rf)
+files=(StopList.gz)
+
+for zone in ${zones[*]} 
+do
+    #echo $zone
+
+    cert=clicert_$zone
+    key=clikey_$zone
+
+    if [ $zone = ru ]
+	then
+		#echo "tld is"
+		tld=ru
+	else
+		#echo "The user"
+		tld=xn--p1ai
+	fi
+
+    #echo $cert $key $tld
+
+    for file in ${files[*]}
+    do
+    	#echo $file
+    	echo curl --cert `pwd`/cert/$cert.pem --key `pwd`/cert/$key.pem -O https://getdata.tcinet.ru/$tld/$file
+    	echo "----------------------------$(date '+%d/%m/%Y %H:%M:%S')-----------------------------------------------"
+    	curl --cert `pwd`/cert/$cert.pem --key `pwd`/cert/$key.pem -o `pwd`/files/$zone/$file https://getdata.tcinet.ru/$tld/$file
+
+    	gunzip -f `pwd`/files/$zone/$file
+    done	
+
+    #curl --cert $cert.pem --key $key_ru.pem -O https://getdata.tcinet.ru/$tld/StopList.gz
+
+done
+
+#dt=$(date '+%d/%m/%Y %H:%M:%S');
+#echo "----------------------------$(date '+%d/%m/%Y %H:%M:%S')-----------------------------------------------"
+

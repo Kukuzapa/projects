@@ -1,0 +1,1353 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+		<link href="/static/favicon/favicon.ico" rel="icon" type="image/x-icon" />
+		
+		<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.0/css/bootstrap.min.css" integrity="sha384-9gVQ4dYFwwWSjIDZnLEWnxCjeSWFphJiwGPXr1jddIhOegiu1FwO5qRGvFXOdJZ4" crossorigin="anonymous">
+
+		<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.8.0/css/bootstrap-datepicker3.standalone.min.css" integrity="sha256-2Te/Z7x8FzV1lOSTEj1s9PsKytIbmbXVNgjUj/2Ew8g=" crossorigin="anonymous">
+
+
+		<link rel="stylesheet" href="https://cdn.jsdelivr.net/jquery.webui-popover/1.2.1/jquery.webui-popover.min.css">
+
+		<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.2.0/css/all.css" integrity="sha384-hWVjflwFxL6sNzntih27bfxkr27PmbbK/iSvJ+a4+0owXq79v+lsFkW54bOGbiDQ" crossorigin="anonymous">
+
+
+
+		<style type="text/css">
+			.autocomplete-suggestions { border: 1px solid #999; background: #FFF; overflow: auto; }
+			.autocomplete-suggestion { padding: 2px 5px; white-space: nowrap; overflow: hidden; }
+			.autocomplete-selected { background: #F0F0F0; }
+			.autocomplete-suggestions strong { font-weight: normal; color: #3399FF; }
+			.autocomplete-group { padding: 2px 5px; }
+			.autocomplete-group strong { display: block; border-bottom: 1px solid #000; }
+
+			#loading {
+				/*display: none;*/
+				position: fixed;
+				width: 100%;
+				height: 100%;
+				z-index: 1050;
+				top: 0;
+				left: 0;
+				background: url(/static/img/loader.svg) center center no-repeat
+				rgba(0, 0, 0, 0.0);
+			}
+
+			
+		</style>
+
+		<title>Фронт АПИ ТЦИ</title>
+	</head>
+	<body>
+		<div id="loading"></div>
+
+		
+
+		<div class="container">
+			<p class="text-center">Фронт АПИ ТЦИ версии 2.1</p>
+			<div class="row">
+				<div class="col-3">
+					<button type="button" class="main_btn btn btn-success btn-block domain d-none d-xl-block d-lg-block d-md-block">Domain</button>
+					
+					<div class="btn-group d-xl-none d-lg-none d-md-none">
+						<button class="btn btn-default dropdown-toggle" type="button" id="dropdownMenu2" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Domain</button>
+						<div class="dropdown-menu dropdown-menu-right">
+							<button class="dropdown-item domainGet dom_btn" type="button">Get</button>
+							<button class="dropdown-item domainCheck dom_btn" type="button">Check</button>
+							<button class="dropdown-item domainCreate dom_btn" type="button">Create</button>
+							<button class="dropdown-item domainUpdate dom_btn" type="button">Update</button>
+							<button class="dropdown-item domainDelete dom_btn" type="button">Delete</button>
+							<button class="dropdown-item domainRenew dom_btn" type="button">Renew</button>
+							<button class="dropdown-item domainTransfer dom_btn" type="button">Transfer</button>
+							<button class="dropdown-item domainCopy dom_btn" type="button">Copy</button>
+							<button class="dropdown-item domainList dom_btn" type="button">List</button>
+						</div>
+					</div>
+				</div>
+				<div class="col-3">
+					<button type="button" class="main_btn btn btn-default btn-block contact d-none d-xl-block d-lg-block d-md-block">Contact</button>
+
+					<div class="btn-group d-xl-none d-lg-none d-md-none">
+						<button class="btn btn-default dropdown-toggle" type="button" id="dropdownMenu2" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Contact</button>
+						<div class="dropdown-menu dropdown-menu-right">
+							<button class="dropdown-item contactGet con_btn" type="button">Get</button>
+							<button class="dropdown-item contactCheck con_btn" type="button">Check</button>
+							<button class="dropdown-item contactCreate con_btn" type="button">Create</button>
+							<button class="dropdown-item contactUpdate con_btn" type="button">Update</button>
+							<button class="dropdown-item contactDelete con_btn" type="button">Delete</button>
+							<button class="dropdown-item contactCopy con_btn" type="button">Copy</button>
+						</div>
+					</div>
+				</div>
+				<div class="col-3">
+					<button type="button" class="main_btn btn btn-default btn-block registrar d-none d-xl-block d-lg-block d-md-block">Registrar</button>
+
+					<div class="btn-group d-xl-none d-lg-none d-md-none">
+						<button class="btn btn-default dropdown-toggle" type="button" id="dropdownMenu2" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Registrar</button>
+						<div class="dropdown-menu dropdown-menu-right">
+							<button class="dropdown-item registrarGet reg_btn" type="button">Get</button>
+							<button class="dropdown-item registrarLimits reg_btn" type="button">Limits</button>
+							<button class="dropdown-item registrarBilling reg_btn" type="button">Billing</button>
+							<button class="dropdown-item registrarUpdate reg_btn" type="button">Update</button>
+							<button class="dropdown-item registrarPoll reg_btn" type="button">Poll</button>
+						</div>
+					</div>
+				</div>
+				<div class="col-3">
+					<button type="button" class="main_btn btn btn-default btn-block operations">Operations</button>
+				</div>
+			</div>
+			<hr/>
+			
+			<div class="row operationsForms" style="display: none;">
+				
+				<form class="col-12" id="history">
+					
+					<div class="row">
+						<div class="form-group col-4">
+							<label for="history_count">Example select</label>
+							<select class="form-control" id="history_count">
+								<option>10</option>
+								<option>15</option>
+								<option>20</option>
+								<option>25</option>
+								<option>30</option>
+							</select>
+						</div>
+						<div class="form-group col-4">
+							<label for="history_from">FROM</label>
+							<input type="text" class="form-control" id="history_from">
+						</div>
+						<div class="form-group col-4">
+							<label for="history_to">TO</label>
+							<input type="text" class="form-control" id="history_to">
+						</div>
+						<div class="form-group col-12">
+							<button type="submit" class="btn btn-default btn-block" id="history_submit">Отправить запрос</button>
+						</div>
+					</div>	
+					
+				</form>
+				<div class="col-12" id="history_fin"></div>
+				<ul id="pagination" class="pagination-sm col-12"></ul>
+			</div>
+
+			<div class="row domainForms">
+				<div class="col-xl-3 col-lg-3 col-md-3 d-none d-xl-block d-lg-block d-md-block">
+					<p><button type="button" class="btn btn-success btn-block btn-sm domainGet dom_btn">Get</button></p>
+					<p><button type="button" class="btn btn-default btn-block btn-sm domainCheck dom_btn">Check</button></p>
+					<p><button type="button" class="btn btn-default btn-block btn-sm domainCreate dom_btn">Create</button></p>
+					<p><button type="button" class="btn btn-default btn-block btn-sm domainUpdate dom_btn">Update</button></p>
+					<p><button type="button" class="btn btn-default btn-block btn-sm domainDelete dom_btn">Delete</button></p>
+					<p><button type="button" class="btn btn-default btn-block btn-sm domainRenew dom_btn">Renew</button></p>
+					<p><button type="button" class="btn btn-default btn-block btn-sm domainTransfer dom_btn">Transfer</button></p>
+					<p><button type="button" class="btn btn-default btn-block btn-sm domainCopy dom_btn">Copy</button></p>
+					<p><button type="button" class="btn btn-default btn-block btn-sm domainList dom_btn">List</button></p>
+				</div>
+				<div class="col-12 col-sm-12 col-xl-9 col-lg-9 col-md-9">
+					<!--DOMAIN List-->
+					<div class="row" id="domainList" style="display: none;">
+						<p class="col-12 text-center">Список доменов из БД</p>
+
+						<div class="col-6">
+							<ul id="paglist" class="pagination-sm"></ul>
+						</div>
+
+						<div class="col-6">
+							<form>
+								<div class="form-group">
+									<div class="input-group mb-3">
+  										<input type="text" class="form-control form-control-sm" id="domainFilter">
+  										<div class="input-group-append">
+    										<span class="input-group-text"><i class="fas fa-search domainFilter"></i></span>
+  										</div>
+									</div>
+								</div>
+							</form>
+						</div>
+
+
+						<div class="col-12">
+							<table class="table table-striped table-sm">
+							  	<thead>
+									<tr>
+								  		<th scope="col">domain <span class="name domlist fas fa-angle-down" data-dir="DESC" data-col="name"></span> <span class="name domlist fas fa-angle-up" data-dir="ASC" data-col="name"  style="display: none;"></span></th>
+								  		<th scope="col">contact</th>
+								  		<th scope="col">status</th>
+								  		<th scope="col">nss</th>
+								  		<th scope="col">exdate <span class="exdate domlist fas fa-angle-down" data-dir="DESC" data-col="exdate"></span> <span class="exdate domlist fas fa-angle-up" data-dir="ASC" data-col="exdate"></span></th>
+								  		<!--th scope="col">upddate</th-->
+									</tr>
+								</thead>
+								<tbody id="domainTable">
+									<!--tr>
+									  	<td>Mark</td>
+									  	<td>Otto</td>
+									  	<td>@mdo</td>
+									</tr-->
+									<!--div id="domainTable"></div-->
+								</tbody>
+							</table>
+						</div>
+						<!--div class="col-12 col-sm-12 col-xl-6 col-lg-6 col-md-6" id="domain_get_fin"></div-->
+					</div>
+
+					<!--DOMAIN GET-->
+					<div class="row" id="domainGet">
+						<p class="col-12 text-center">Получение информации о домене из реестра</p>
+						<form class="col-12 col-sm-12 col-xl-6 col-lg-6 col-md-6" id="domain_get">
+							<div class="row">
+								<div class="form-group col-12">
+									<label for="domain_get_name">Введите имя домена</label>
+									<input type="text" class="form-control typeahead_domain" id="domain_get_name">
+								</div>
+								<div class="form-group col-12">
+									<label for="domain_get_name">Введите код аутентификации ( опц. )</label>
+									<input type="text" class="form-control gggg" id="domain_get_auth">
+								</div>
+								<div class="form-group col-12">
+									<button type="submit" class="btn btn-default btn-block" id="domain_get_submit">Отправить запрос</button>
+								</div>
+							</div>
+						</form>
+						<div class="col-12 col-sm-12 col-xl-6 col-lg-6 col-md-6" id="domain_get_fin"></div>
+					</div>
+
+					<!--DOMAIN CHECK-->
+					<div class="row" id="domainCheck" style="display: none;">
+						<p class="col-12 text-center">Проверка занятости имени домена</p>
+						<form class="col-12 col-sm-12 col-xl-6 col-lg-6 col-md-6" id="domain_check">
+							<div class="row">
+								<div class="form-group col-12">
+									<label for="domain_check_name">Введите имя домена</label>
+									<input type="text" class="form-control" id="domain_check_name">
+								</div>
+								<div class="form-group col-12">
+									<button type="submit" class="btn btn-default btn-block" id="domain_check_submit">Отправить запрос</button>
+								</div>
+							</div>
+						</form>
+						<div class="col-12 col-sm-12 col-xl-6 col-lg-6 col-md-6" id="domain_check_fin"></div>
+					</div>
+
+					<!--DOMAIN CREATE-->
+					<div class="row" id="domainCreate" style="display: none;">
+						<p class="col-12 text-center">Создание домена</p>
+						<form class="col-12" id="domain_create">
+							<div class="row">
+								<div class="col-12 col-sm-12 col-xl-12 col-lg-12 col-md-12">
+									<div class="form-group">
+										<label for="domain_create_name">Введите имя домена</label>
+										<input type="text" class="form-control" id="domain_create_name">
+									</div>
+								</div>
+								<div class="col-12 col-sm-12 col-xl-6 col-lg-6 col-md-6">
+									<div class="form-group">
+										<label for="domain_create_reginfo">Укажите владельца домена</label>
+										<input type="text" class="form-control typeahead_registrar" data-id="domain_create_registrant" id="domain_create_reginfo">
+									</div>
+									<div class="form-group">
+										<label for="domain_create_registrant">ИД Владельца домена</label>
+										<input type="text" class="form-control domain_crupd_registrant" id="domain_create_registrant">
+									</div>
+								</div>	
+								<div class="col-12 col-sm-12 col-xl-6 col-lg-6 col-md-6">	
+									<div class="form-group">
+										<label for="domain_create_description">Описание домена ( опц. )</label>
+										<input type="text" class="form-control" id="domain_create_description">
+									</div>
+									<div class="form-group">
+										<label for="domain_create_auth">Код аутентификации ( опц. )</label>
+										<input type="text" class="form-control" id="domain_create_authInfo">
+									</div>
+								</div>
+								
+								<div class="col-12 col-sm-12 col-xl-12 col-lg-12 col-md-12" id="dc-nss">
+									<button type="button" class="btn btn-default btn-block mb-3 domain_add_nss" data-id="dc-nss" data-command="cr">Добавление НС сервера</button>
+								</div>
+
+								<div class="form-group col-12">
+									<button type="submit" class="btn btn-default btn-block mb-3" id="domain_create_submit">Отправить запрос</button>
+								</div>
+							</div>
+						</form>
+						<div class="col-12" id="domain_create_fin"></div>
+					</div>
+
+					<!--DOMAIN UPDATE-->
+					<div class="row" id="domainUpdate" style="display: none;">
+						<p class="col-12 text-center">Обновление данных о домене</p>
+						<form class="col-12" id="domain_update">
+							<div class="row">
+								<div class="col-12 col-sm-12 col-xl-12 col-lg-12 col-md-12">
+									<div class="form-group">
+										<label for="domain_update_name">Введите имя домена ( обязательно )</label>
+										<input type="text" class="form-control" id="domain_update_name">
+									</div>
+
+									<div class="form-group" style="display: none;">
+										<label for="current_registrant">Тайный покупатель</label>
+										<input type="text" class="form-control" id="current_registrant">
+									</div>
+								</div>
+								<div class="col-12 col-sm-12 col-xl-6 col-lg-6 col-md-6">
+									<div class="form-group">
+										<label for="domain_update_reginfo">Укажите нового владельца ( опц. )</label>
+										<input type="text" class="form-control typeahead_registrar" data-id="domain_update_registrant" id="domain_update_reginfo">
+									</div>
+
+									<div class="form-group">
+										<label for="domain_update_registrant">ИД нового владельца</label>
+										<input type="text" class="form-control domain_crupd_registrant" id="domain_update_registrant">
+									</div>
+								</div>
+								<div class="col-12 col-sm-12 col-xl-6 col-lg-6 col-md-6">
+									<div class="form-group">
+										<label for="domain_update_description">Описание домена ( опц. )</label>
+										<input type="text" class="form-control" id="domain_update_description">
+									</div>
+									<div class="form-group">
+										<label for="domain_update_auth">Код аутентификации ( опц. )</label>
+										<input type="text" class="form-control" id="domain_update_authInfo">
+									</div>
+								</div>
+								<p class="col-12 text-center">Статусы</p>
+								<div class="form-group col-12 col-sm-12 col-xl-6 col-lg-6 col-md-6">
+									<div class="form-check">
+										<input class="form-check-input" type="checkbox" value="" id="domain_clientUpdateProhibited">
+										<label class="form-check-label" for="domain_clientUpdateProhibited">clientUpdateProhibited</label>
+									</div>
+								</div>
+								<div class="form-group col-12 col-sm-12 col-xl-6 col-lg-6 col-md-6">
+									<div class="form-check">
+										<input class="form-check-input" type="checkbox" value="" id="domain_clientTransferProhibited">
+										<label class="form-check-label" for="domain_clientTransferProhibited">clientTransferProhibited</label>
+									</div>
+								</div>
+								<div class="form-group col-12 col-sm-12 col-xl-6 col-lg-6 col-md-6">
+									<div class="form-check">
+										<input class="form-check-input" type="checkbox" value="133" id="domain_clientDeleteProhibited">
+										<label class="form-check-label" for="domain_clientDeleteProhibited">clientDeleteProhibited</label>
+									</div>
+								</div>
+								<div class="form-group col-12 col-sm-12 col-xl-6 col-lg-6 col-md-6">
+									<div class="form-check">
+										<input class="form-check-input" type="checkbox" value="" id="domain_clientHold">
+										<label class="form-check-label" for="domain_clientHold">clientHold</label>
+									</div>
+								</div>
+								<div class="form-group col-12 col-sm-12 col-xl-6 col-lg-6 col-md-6">
+									<div class="form-check">
+										<input class="form-check-input" type="checkbox" value="" id="domain_clientRenewProhibited">
+										<label class="form-check-label" for="domain_clientRenewProhibited">clientRenewProhibited</label>
+									</div>
+								</div>
+								<div class="form-group col-12 col-sm-12 col-xl-6 col-lg-6 col-md-6">
+									<div class="form-check">
+										<input class="form-check-input" type="checkbox" value="" id="domain_changeProhibited">
+										<label class="form-check-label" for="domain_changeProhibited">changeProhibited</label>
+									</div>
+								</div>
+								
+								<div class="col-12 col-sm-12 col-xl-12 col-lg-12 col-md-12" id="du-nss">
+									<button type="button" class="btn btn-default btn-block mb-3 domain_add_nss" data-id="du-nss" data-command="up">Добавление НС сервера</button>
+								</div>
+								<div class="form-group col-12">
+									<button type="submit" class="btn btn-default btn-block" id="domain_update_submit">Отправить запрос</button>
+								</div>
+							</div>
+						</form>
+						<div class="col-12" id="bad_object_update"></div>
+						<div class="col-12" id="domain_update_fin"></div>
+					</div>
+
+					<!--DOMAIN DELETE-->
+					<div class="row" id="domainDelete" style="display: none;">
+						<p class="col-12 text-center">Удаление домена</p>
+						<form class="col-12 col-sm-12 col-xl-6 col-lg-6 col-md-6" id="domain_delete">
+							<div class="row">
+								<div class="form-group col-12">
+									<label for="domain_delete_name">Введите имя домена</label>
+									<input type="text" class="form-control typeahead_domain" id="domain_delete_name">
+								</div>
+								<div class="form-group col-12">
+									<button type="submit" class="btn btn-default btn-block" id="domain_delete_submit">Отправить запрос</button>
+								</div>
+							</div>
+						</form>
+						<div class="col-12 col-sm-12 col-xl-6 col-lg-6 col-md-6" id="domain_delete_fin"></div>
+					</div>
+
+					<!--DOMAIN RENEW-->
+					<div class="row" id="domainRenew" style="display: none;">
+						<p class="col-12 text-center">Продление домена</p>
+						<form class="col-12 col-sm-12 col-xl-6 col-lg-6 col-md-6" id="domain_renew">
+							<div class="row">
+								<div class="form-group col-12">
+									<label for="domain_renew_name">Введите имя домена</label>
+									<input type="text" class="form-control" id="domain_renew_name">
+								</div>
+								<div class="form-group col-12">
+									<label for="domain_renew_curExpDate">Дата окончания регистрации</label>
+									<input type="text" class="form-control" id="domain_renew_curExpDate">
+								</div>
+								<div class="form-group col-12">
+									<button type="submit" class="btn btn-default btn-block" id="domain_renew_submit">Отправить запрос</button>
+								</div>
+							</div>
+						</form>
+						<div class="col-12 col-sm-12 col-xl-6 col-lg-6 col-md-6" id="domain_renew_fin"></div>
+					</div>
+
+					<!--DOMAIN TRANSFER-->
+					<div class="row" id="domainTransfer" style="display: none;">
+						<p class="col-12 text-center">Передача домена</p>
+						<form class="col-12 col-sm-12 col-xl-6 col-lg-6 col-md-6" id="domain_transfer">
+							<div class="row">
+								<div class="form-group col-12">
+									<label for="domain_transfer_select">Выбор типа запроса</label>
+									<select class="custom-select" id="domain_transfer_select">
+										<option>request</option>
+										<option>approve</option>
+										<option>reject</option>
+										<option>cancel</option>
+										<option>ok</option>
+									</select>
+								</div>
+								<div class="form-group col-12">
+									<label for="domain_transfer_name">Введите имя домена</label>
+									<input type="text" class="form-control" id="domain_transfer_name">
+								</div>
+								<div class="form-group col-12">
+									<label for="domain_transfer_auth">Код аутентификации</label>
+									<input type="text" class="form-control" id="domain_transfer_auth">
+								</div>
+								<div class="form-group col-12">
+									<button type="submit" class="btn btn-default btn-block" id="domain_transfer_submit">Отправить запрос</button>
+								</div>
+							</div>
+						</form>
+						<div class="col-12 col-sm-12 col-xl-6 col-lg-6 col-md-6" id="domain_transfer_fin"></div>
+					</div>
+
+					<!--DOMAIN COPY-->
+					<div class="row" id="domainCopy" style="display: none;">
+						<p class="col-12 text-center">Копирование информации о домене в БД</p>
+						<form class="col-12 col-sm-12 col-xl-6 col-lg-6 col-md-6" id="domain_copy">
+							<div class="row">
+								<div class="form-group col-12">
+									<label for="domain_copy_name">Введите имя домена</label>
+									<input type="text" class="form-control" id="domain_copy_name">
+								</div>
+								<div class="form-group col-12">
+									<label for="domain_copy_auth">Код аутентификации ( опц. )</label>
+									<input type="text" class="form-control" id="domain_copy_auth">
+								</div>
+								<div class="form-group col-12">
+									<button type="submit" class="btn btn-default btn-block" id="domain_copy_submit">Отправить запрос</button>
+								</div>
+							</div>
+						</form>
+						<div class="col-12 col-sm-12 col-xl-6 col-lg-6 col-md-6" id="domain_copy_fin"></div>
+					</div>
+				</div>
+			</div>
+
+			<div class="row contactForms" style="display: none">
+				<div class="col-xl-3 col-lg-3 col-md-3 d-none d-xl-block d-lg-block d-md-block">
+					<p><button type="button" class="btn btn-success btn-block btn-sm contactGet con_btn">Get</button></p>
+					<p><button type="button" class="btn btn-default btn-block btn-sm contactCheck con_btn">Check</button></p>
+					<p><button type="button" class="btn btn-default btn-block btn-sm contactCreate con_btn">Create</button></p>
+					<p><button type="button" class="btn btn-default btn-block btn-sm contactUpdate con_btn">Update</button></p>
+					<p><button type="button" class="btn btn-default btn-block btn-sm contactDelete con_btn">Delete</button></p>
+					<p><button type="button" class="btn btn-default btn-block btn-sm contactCopy con_btn">Copy</button></p>
+				</div>
+				
+				<div class="col-12 col-sm-12 col-xl-9 col-lg-9 col-md-9">
+					
+					<!--CONTACT GET-->
+					<div class="row" id="contactGet">
+						<p class="col-12 text-center">Получение информации о контакте из реестра</p>
+						<form class="col-12 col-sm-12 col-xl-6 col-lg-6 col-md-6" id="contact_get">
+							<div class="row">
+								<div class="form-group col-12">
+									<label for="contact_get_select">Выбор регистратора</label>
+									<select class="custom-select" id="contact_get_select">
+										<option>REGFORMAT-RU</option>
+										<option>REGFORMAT-RF</option>
+									</select>
+								</div>
+								
+								<div class="form-group col-12">
+									<label for="contact_get_info">Имя/название контакта</label>
+									<input type="text" class="form-control typeahead_contact" data-reg="contact_get_select" data-id="contact_get_id" id="contact_get_info">
+								</div>							
+
+								<div class="form-group col-12">
+									<label for="contact_get_id">ИД Контакта</label>
+									<input type="text" class="form-control" id="contact_get_id">
+								</div>
+
+								<div class="form-group col-12">
+									<label for="contact_get_auth">Код аутентификации ( опц. )</label>
+									<input type="text" class="form-control" id="contact_get_auth">
+								</div>
+								<div class="form-group col-12">
+									<button type="submit" class="btn btn-default btn-block" id="contact_get_submit">Отправить запрос</button>
+								</div>
+							</div>
+						</form>
+						<div class="col-12 col-sm-12 col-xl-6 col-lg-6 col-md-6" id="contact_get_fin"></div>
+					</div>
+
+					<!--CONTACT CREATE-->
+					<div class="row" id="contactCreate" style="display: none;">
+						<p class="col-12 text-center">Создание контакта<span class="show_person_cc"> физического</span><span class="show_org_cc" style="display:none"> юридического</span> лица</p>
+						<form class="col-12" id="contact_create">
+							<div class="row">
+								<div class="form-group col-12 col-sm-12 col-xl-6 col-lg-6 col-md-6">
+									<label for="contact_create_select">Выбор регистратора</label>
+									<select class="custom-select" id="contact_create_select">
+										<option>REGFORMAT-RU</option>
+										<option>REGFORMAT-RF</option>
+									</select>
+								</div>
+								<div class="form-group col-12 col-sm-12 col-xl-6 col-lg-6 col-md-6">
+									<label for="contact_create_type">Выбор типа контакта</label>
+									<select class="custom-select contact_type" id="contact_create_type" data-command='cc'>
+										<option>person</option>
+										<option>organization</option>
+									</select>
+								</div>
+								<div class="form-group show_person_cc col-12">
+									<label for="contact_create_name">Имя физ. лица</label>
+									<input type="text" class="form-control" id="contact_create_name">
+								</div>
+								<div class="form-group show_org_cc col-12" style="display:none">
+									<label for="contact_create_org">Название организации</label>
+									<input type="text" class="form-control" id="contact_create_org">
+								</div>
+
+								<div class="form-group show_person_cc col-12 col-sm-12 col-xl-6 col-lg-6 col-md-6">
+									<label for="contact_create_intname">Имя физ. лица ( англ. )</label>
+									<input type="text" class="form-control" id="contact_create_int_name">
+								</div>
+								<div class="form-group show_org_cc col-12 col-sm-12 col-xl-6 col-lg-6 col-md-6" style="display:none">
+									<label for="contact_create_intorg">Название организации ( англ. )</label>
+									<input type="text" class="form-control" id="contact_create_int_org">
+								</div>
+								<div class="form-group show_person_cc col-12 col-sm-12 col-xl-6 col-lg-6 col-md-6">
+									<label for="contact_create_birthday">Дата рождения</label>
+									<input type="text" class="form-control birthday" id="contact_create_birthday">
+								</div>
+
+								<div class="form-group show_org_cc col-12 col-sm-12 col-xl-6 col-lg-6 col-md-6" style="display:none">
+									<label for="contact_create_taxpayerNumbers">ИНН</label>
+									<input type="text" class="form-control" id="contact_create_taxpayerNumbers">
+								</div>
+								<div class="form-group show_person_cc col-12">
+									<label for="contact_create_passport">Паспортные данные</label>
+									<textarea class="form-control" id="contact_create_passport"></textarea>
+								</div>
+								<div class="form-group col-12">
+									<label for="contact_create_address">Адрес</label>
+									<input type="text" class="form-control" id="contact_create_address">
+								</div>
+								<div class="form-group show_org_cc col-12" style="display:none">
+									<label for="contact_create_legaddress">Юридический адрес</label>
+									<input type="text" class="form-control" id="contact_create_leg_address">
+								</div>
+								<div class="form-group col-12 col-sm-12 col-xl-6 col-lg-6 col-md-6" id='cc-voice'>
+									<label for="contact_create_voice">Телефон</label>
+									<div class="input-group mb-3">
+										<input type="text" class="form-control form-control-sm con_cr_voice_val" id="contact_create_voice">
+										<div class="input-group-append add_voice_email" data-id="cc-voice" data-command="cr"  data-value="voice">
+											<span class="input-group-text">+</span>
+										</div>
+									</div>
+								</div>
+								<div class="form-group col-12 col-sm-12 col-xl-6 col-lg-6 col-md-6" id='cc-email'>
+									<label for="contact_create_email">Email</label>
+									<div class="input-group mb-3">
+										<input type="text" class="form-control form-control-sm con_cr_email_val" id="contact_create_email">
+										<div class="input-group-append add_voice_email" data-id="cc-email" data-command="cr" data-value="email">
+											<span class="input-group-text">+</span>
+										</div>
+									</div>
+								</div>
+								
+								<div class="form-group col-12">
+									<button type="submit" class="btn btn-default btn-block" id="contact_create_submit">Отправить запрос</button>
+								</div>
+							</div>
+						</form>
+						<div class="col-12" id="contact_create_fin"></div>
+					</div>
+
+					<!--CONTACT CHECK-->
+					<div class="row" id="contactCheck" style="display: none;">
+						<p class="col-12 text-center">Проверка существования идентификатора контакта</p>
+						<form class="col-12 col-sm-12 col-xl-6 col-lg-6 col-md-6" id="contact_check">
+							<div class="row">
+								<div class="form-group col-12">
+									<label for="contact_check_select">Выбор регистратора</label>
+									<select class="custom-select" id="contact_check_select">
+										<option>REGFORMAT-RU</option>
+										<option>REGFORMAT-RF</option>
+									</select>
+								</div>
+								<div class="form-group col-12">
+									<label for="contact_check_id">ИД Контакта</label>
+									<input type="text" class="form-control" id="contact_check_id">
+								</div>
+								<div class="form-group col-12">
+									<button type="submit" class="btn btn-default btn-block" id="contact_check_submit">Отправить запрос</button>
+								</div>
+							</div>
+						</form>
+						<div class="col-12 col-sm-12 col-xl-6 col-lg-6 col-md-6" id="contact_check_fin"></div>
+					</div>
+
+					<!--CONTACT UPDATE-->
+					<div class="row" id="contactUpdate" style="display: none;">
+						<p class="col-12 text-center">Обновление контакта</p>
+						<form class="col-12" id="contact_update">
+							<div class="row">
+								<div class="form-group col-12">
+									<label for="contact_update_info">Имя/название контакта</label>
+									<input type="text" class="form-control" data-reg="contact_update_select" id="contact_update_info">
+								</div>
+								<div class="form-group col-12" style="display:none">
+									<label for="contact_update_select">REG</label>
+									<input type="text" class="form-control" id="contact_update_select">
+								</div>								
+								<div class="form-group col-12" style="display:none">
+									<label for="contact_update_id">Contact id</label>
+									<input type="text" class="form-control" id="contact_update_id">
+								</div>
+								<div class="form-group col-12" style="display:none">
+									<label for="contact_update_authInfo">Enter authInfo</label>
+									<input type="text" class="form-control" id="contact_update_authInfo">
+								</div>
+								<div class="form-group col-12 col-sm-12 col-xl-6 col-lg-6 col-md-6 show_person_cu" style="display:none">
+									<label for="contact_update_name">Имя физ. лица</label>
+									<input type="text" class="form-control" id="contact_update_name">
+								</div>
+								<div class="form-group col-12 col-sm-12 col-xl-6 col-lg-6 col-md-6 show_person_cu" style="display:none">
+									<label for="contact_update_intname">Имя физ. лица ( фнгл. )</label>
+									<input type="text" class="form-control" id="contact_update_int_name">
+								</div>
+								<div class="form-group col-12 show_org_cu" style="display:none">
+									<label for="contact_update_org">Название организации</label>
+									<input type="text" class="form-control" id="contact_update_org">
+								</div>
+								<div class="form-group col-12 col-sm-12 col-xl-6 col-lg-6 col-md-6 show_org_cu" style="display:none">
+									<label for="contact_update_intorg">Название организации ( англ. )</label>
+									<input type="text" class="form-control" id="contact_update_int_org">
+								</div>
+								<div class="form-group col-12 col-sm-12 col-xl-6 col-lg-6 col-md-6 show_org_cu" style="display:none">
+									<label for="contact_update_taxpayerNumbers">ИНН</label>
+									<input type="text" class="form-control" id="contact_update_taxpayerNumbers">
+								</div>
+								<div class="form-group col-12 show_person_cu show_org_cu" style="display:none">
+									<label for="contact_update_address">Адрес</label>
+									<input type="text" class="form-control" id="contact_update_address">
+								</div>
+								<div class="form-group col-12 col-sm-12 col-xl-6 col-lg-6 col-md-6 show_org_cu" style="display:none">
+									<label for="contact_update_legaddress">Юридический адрес</label>
+									<input type="text" class="form-control" id="contact_update_leg_address">
+								</div>
+								
+								
+								
+								<!--div class="form-group col-12 col-sm-12 col-xl-6 col-lg-6 col-md-6 show_person_cu" style="display:none">
+									<label for="contact_update_passport">Enter passport</label>
+									<input type="text" class="form-control" id="contact_update_passport">
+								</div-->
+								<div class="form-group show_person_cu col-12" style="display:none">
+									<label for="contact_update_passport">Паспортные данные</label>
+									<!--input type="text" class="form-control" id="contact_create_passport"-->
+									<textarea class="form-control" id="contact_update_passport"></textarea>
+								</div>
+
+
+								<div class="form-group col-12 col-sm-12 col-xl-6 col-lg-6 col-md-6 show_person_cu show_org_cu" style="display:none">
+									<label for="contact_update_ver">Подтверждение данных</label>
+									<select class="custom-select" id="contact_update_verified">
+										<option>verified</option>
+										<option>unverified</option>
+									</select>
+								</div>
+								<div class="form-group col-12 col-sm-12 col-xl-6 col-lg-6 col-md-6 show_person_cu" style="display:none">
+									<label for="contact_update_birthday">Дата рождения</label>
+									<input type="text" class="form-control birthday" id="contact_update_birthday">
+								</div>
+								<div class="col-12 col-sm-12 col-xl-6 col-lg-6 col-md-6 show_person_cu show_org_cu" style="display:none">
+									<div class="form-group" id='cu-voice'>
+										<label for="contact_update_voice">Телефон</label>
+										<div class="input-group mb-3">
+											<input type="text" class="form-control form-control-sm con_up_voice_val" id="contact_update_voice">
+
+											<div class="input-group-append add_voice_email" data-id="cu-voice" data-command="up"  data-value="voice">
+												<span class="input-group-text">+</span>
+											</div>
+										</div>
+									</div>
+								</div>
+								<div class="col-12 col-sm-12 col-xl-6 col-lg-6 col-md-6 show_person_cu show_org_cu" style="display:none">
+									<div class="form-group" id='cu-email'>
+										<label for="contact_update_email">Email</label>
+										<div class="input-group mb-3">
+											<input type="text" class="form-control form-control-sm con_up_email_val" id="contact_update_email">
+							
+											<div class="input-group-append add_voice_email" data-id="cu-email" data-command="up" data-value="email">
+												<span class="input-group-text">+</span>
+											</div>
+										</div>
+									</div>
+								</div>
+
+								<p class="col-12 text-center show_person_cu show_org_cu" style="display:none">Статусы</p>
+								<div class="form-group col-12 col-sm-12 col-xl-6 col-lg-6 col-md-6 show_person_cu show_org_cu" style="display:none">
+									<div class="form-check">
+										<input class="form-check-input" type="checkbox" value="" id="contact_clientUpdateProhibited">
+										<label class="form-check-label" for="contact_clientUpdateProhibited">clientUpdateProhibited</label>
+									</div>
+								</div>
+								<div class="form-group col-12 col-sm-12 col-xl-6 col-lg-6 col-md-6 show_person_cu show_org_cu" style="display:none">
+									<div class="form-check">
+										<input class="form-check-input" type="checkbox" value="" id="contact_clientDeleteProhibited">
+										<label class="form-check-label" for="contact_clientDeleteProhibited">clientDeleteProhibited</label>
+									</div>
+								</div>
+
+								<!--div class="col-12 show_person_cu show_org_cu" style="display:none">
+									<button type="button" class="btn btn-default btn-block mb-3 add_status" data-id="c-sts" data-obj="con">Add Status</button>
+									<div class="row" id="c-sts"></div>
+								</div-->
+								
+								<div class="form-group col-12 show_person_cu show_org_cu" style="display:none">
+									<button type="submit" class="btn btn-default btn-block" id="contact_update_submit">Отправить запрос</button>
+								</div>
+							</div>
+						</form>
+						<div class="col-12 col-sm-12 col-xl-6 col-lg-6 col-md-6" id="contact_update_fin"></div>
+					</div>
+
+					<!--CONTACT DELETE-->
+					<div class="row" id="contactDelete" style="display: none;">
+						<p class="col-12 text-center">Удаление контакта</p>
+						<form class="col-12 col-sm-12 col-xl-6 col-lg-6 col-md-6" id="contact_delete">
+							<div class="row">
+								<div class="form-group  col-12">
+									<label for="contact_delete_select">Выбор регистратора</label>
+									<select class="custom-select" id="contact_delete_select">
+										<option>REGFORMAT-RU</option>
+										<option>REGFORMAT-RF</option>
+									</select>
+								</div>
+								<div class="form-group col-12">
+									<label for="contact_delete_info">Имя/название контакта</label>
+									<input type="text" class="form-control typeahead_contact" data-reg="contact_delete_select" data-id="contact_delete_id" id="contact_delete_info">
+								</div>							
+								<div class="form-group col-12">
+									<label for="contact_delete_id">ИД контакта</label>
+									<input type="text" class="form-control" id="contact_delete_id">
+								</div>
+								<div class="form-group col-12">
+									<button type="submit" class="btn btn-default btn-block" id="contact_delete_submit">Отправить запрос</button>
+								</div>
+							</div>
+						</form>
+						<div class="col-12 col-sm-12 col-xl-6 col-lg-6 col-md-6" id="contact_delete_fin"></div>
+					</div>
+
+					<!--CONTACT COPY-->
+					<div class="row" id="contactCopy" style="display: none;">
+						<p class="col-12 text-center">Копирование контакта в БД</p>
+						<form class="col-12 col-sm-12 col-xl-6 col-lg-6 col-md-6" id="contact_copy">
+							<div class="row">
+								<div class="form-group col-12">
+									<label for="contact_copy_select">Выбор регистратора</label>
+									<select class="custom-select" id="contact_copy_select">
+										<option>REGFORMAT-RU</option>
+										<option>REGFORMAT-RF</option>
+									</select>
+								</div>
+								<div class="form-group col-12">
+									<label for="contact_copy_info">Имя/название контакта</label>
+									<input type="text" class="form-control typeahead_contact" data-reg="contact_copy_select" data-id="contact_copy_id" id="contact_copy_info">
+								</div>
+								<div class="form-group col-12">
+									<label for="contact_copy_id">ИД контакта</label>
+									<input type="text" class="form-control" id="contact_copy_id">
+								</div>
+								<div class="form-group col-12">
+									<label for="contact_copy_auth">Код аутентификации ( опц. )</label>
+									<input type="text" class="form-control" id="contact_copy_auth">
+								</div>
+								<div class="form-group col-12">
+									<button type="submit" class="btn btn-default btn-block" id="contact_copy_submit">Отправить запрос</button>
+								</div>
+							</div>
+						</form>
+						<div class="col-12 col-sm-12 col-xl-6 col-lg-6 col-md-6" id="contact_copy_fin"></div>
+					</div>
+				</div>
+			</div>
+
+			<div class="row registrarForms" style="display: none">
+				<div class="col-xl-3 col-lg-3 col-md-3 d-none d-xl-block d-lg-block d-md-block">
+					<p><button type="button" class="btn btn-success btn-block btn-sm registrarGet reg_btn">Get</button></p>
+					<p><button type="button" class="btn btn-default btn-block btn-sm registrarLimits reg_btn">Limits</button></p>
+					<p><button type="button" class="btn btn-default btn-block btn-sm registrarBilling reg_btn">Billing</button></p>
+					<p><button type="button" class="btn btn-default btn-block btn-sm registrarUpdate reg_btn">Update</button></p>
+					<p><button type="button" class="btn btn-default btn-block btn-sm registrarPoll reg_btn">Poll</button></p>
+				</div>
+				<div class="col-12 col-sm-12 col-xl-9 col-lg-9 col-md-9">
+					
+					<!--REGISTRAR GET-->
+					<div class="row" id="registrarGet">
+						<p class="col-12 text-center">Информация о регистраторе</p>
+						<form class="col-12 col-sm-12 col-xl-6 col-lg-6 col-md-6" id="registrar_get">
+							<div class="row">
+								<div class="form-group col-12">
+									<label for="registrar_get_select">Выбор регистратора</label>
+									<select class="custom-select" id="registrar_get_select">
+										<option>REGFORMAT-RU</option>
+										<option>REGFORMAT-RF</option>
+									</select>
+								</div>
+								<div class="form-group col-12">
+									<button type="submit" class="btn btn-default btn-block" id="registrar_get_submit">Отправить запрос</button>
+								</div>
+							</div>
+						</form>
+						<div class="col-12 col-sm-12 col-xl-6 col-lg-6 col-md-6" id="registrar_get_fin"></div>
+					</div>
+
+					<!--REGISTRAR UPDATE-->
+					<div class="row" id="registrarUpdate" style="display: none;">
+						<p class="col-12 text-center">Обновление адресов регистратора</p>
+						<form class="col-12" id="registrar_update">
+							<div class="row">
+								<div class="form-group col-12">
+									<label for="registrar_update_select">Выбор регистратора</label>
+									<select class="custom-select" id="registrar_update_select">
+										<option>REGFORMAT-RU</option>
+										<option>REGFORMAT-RF</option>
+									</select>
+								</div>
+								<div class="form-group col-12 col-sm-12 col-xl-4 col-lg-4 col-md-6">
+									<input type="text" class="form-control registrar_update_ip" id="regip_1" placeholder="Не надо ничего вводить">
+								</div>
+								<div class="form-group col-12 col-sm-12 col-xl-4 col-lg-4 col-md-6">
+									<input type="text" class="form-control registrar_update_ip" id="regip_2" placeholder="Не надо ничего вводить">
+								</div>
+								<div class="form-group col-12 col-sm-12 col-xl-4 col-lg-4 col-md-6">
+									<input type="text" class="form-control registrar_update_ip" id="regip_3" placeholder="Не надо ничего вводить">
+								</div>
+								<div class="form-group col-12 col-sm-12 col-xl-4 col-lg-4 col-md-6">
+									<input type="text" class="form-control registrar_update_ip" id="regip_4" placeholder="Не надо ничего вводить">
+								</div>
+								<div class="form-group col-12 col-sm-12 col-xl-4 col-lg-4 col-md-6">
+									<input type="text" class="form-control registrar_update_ip" id="regip_5" placeholder="Не надо ничего вводить">
+								</div>
+								<div class="form-group col-12 col-sm-12 col-xl-4 col-lg-4 col-md-6">
+									<input type="text" class="form-control registrar_update_ip" id="regip_6" placeholder="Не надо ничего вводить">
+								</div>
+								<div class="form-group col-12 col-sm-12 col-xl-4 col-lg-4 col-md-6">
+									<input type="text" class="form-control registrar_update_ip" id="regip_7" placeholder="Не надо ничего вводить">
+								</div>
+								<div class="form-group col-12 col-sm-12 col-xl-4 col-lg-4 col-md-6">
+									<input type="text" class="form-control registrar_update_ip" id="regip_8" placeholder="Не надо ничего вводить">
+								</div>
+								<div class="form-group col-12 col-sm-12 col-xl-4 col-lg-4 col-md-6">
+									<input type="text" class="form-control registrar_update_ip" id="regip_9" placeholder="Не надо ничего вводить">
+								</div>
+								<div class="form-group col-12 col-sm-12 col-xl-4 col-lg-4 col-md-6">
+									<input type="text" class="form-control registrar_update_ip" id="regip_10" placeholder="Не надо ничего вводить">
+								</div>
+								<div class="form-group col-12 col-sm-12 col-xl-4 col-lg-4 col-md-6">
+									<input type="text" class="form-control registrar_update_ip" id="regip_11" placeholder="Не надо ничего вводить">
+								</div>
+								<div class="form-group col-12 col-sm-12 col-xl-4 col-lg-4 col-md-6">
+									<input type="text" class="form-control registrar_update_ip" id="regip_12" placeholder="Не надо ничего вводить">
+								</div>
+								<div class="form-group col-12 col-sm-12 col-xl-4 col-lg-4 col-md-6">
+									<input type="text" class="form-control registrar_update_ip" id="regip_13" placeholder="Не надо ничего вводить">
+								</div>
+								<div class="form-group col-12 col-sm-12 col-xl-4 col-lg-4 col-md-6">
+									<input type="text" class="form-control registrar_update_ip" id="regip_14" placeholder="Не надо ничего вводить">
+								</div>
+								<div class="form-group col-12 col-sm-12 col-xl-4 col-lg-4 col-md-6">
+									<input type="text" class="form-control registrar_update_ip" id="regip_15" placeholder="Не надо ничего вводить">
+								</div>
+								<div class="form-group col-12 col-sm-12 col-xl-4 col-lg-4 col-md-6">
+									<input type="text" class="form-control registrar_update_ip" id="regip_16" placeholder="Не надо ничего вводить">
+								</div>
+								<div class="form-group col-12 col-sm-12 col-xl-4 col-lg-4 col-md-6">
+									<input type="text" class="form-control registrar_update_ip" id="regip_17" placeholder="Не надо ничего вводить">
+								</div>
+								<div class="form-group col-12 col-sm-12 col-xl-4 col-lg-4 col-md-6">
+									<input type="text" class="form-control registrar_update_ip" id="regip_18" placeholder="Не надо ничего вводить">
+								</div>
+								<div class="form-group col-12 col-sm-12 col-xl-4 col-lg-4 col-md-6">
+									<input type="text" class="form-control registrar_update_ip" id="regip_19" placeholder="Не надо ничего вводить">
+								</div>
+								<div class="form-group col-12 col-sm-12 col-xl-4 col-lg-4 col-md-6">
+									<input type="text" class="form-control registrar_update_ip" id="regip_20" placeholder="Не надо ничего вводить">
+								</div>
+								<div class="col-12" id="bad_registrar_update"></div>
+								<div class="form-group col-12">
+									<button type="submit" class="btn btn-default btn-block" id="registrar_update_submit">Оно вам надо?</button>
+								</div>
+							</div>
+						</form>
+						<div class="col-12 col-sm-12 col-xl-6 col-lg-6 col-md-6" id="registrar_update_fin"></div>
+					</div>
+
+					<!--REGISTRAR LIMITS-->
+					<div class="row" id="registrarLimits" style="display: none;">
+						<p class="col-12 text-center">Ограничения регистратора</p>
+						<form class="col-12 col-sm-12 col-xl-6 col-lg-6 col-md-6" id="registrar_limits">
+							<div class="row">
+								<div class="form-group col-12">
+									<label for="registrar_limits_select">Выбор регистратора</label>
+									<select class="custom-select" id="registrar_limits_select">
+										<option>REGFORMAT-RU</option>
+										<option>REGFORMAT-RF</option>
+									</select>
+								</div>
+								<div class="form-group col-12">
+									<button type="submit" class="btn btn-default btn-block" id="registrar_limits_submit">Отправить запрос</button>
+								</div>
+							</div>
+						</form>
+						<div class="col-12 col-sm-12 col-xl-6 col-lg-6 col-md-6" id="registrar_limits_fin"></div>
+					</div>
+
+					<!--REGISTRAR BILLING-->
+					<div class="row" id="registrarBilling" style="display: none;">
+						<p class="col-12 text-center">Счет регистратора</p>
+						<form class="col-12 col-sm-12 col-xl-6 col-lg-6 col-md-6" id="registrar_billing">
+							<div class="row">
+								<div class="form-group col-12">
+									<label for="registrar_billing_select">Выбор регистратора</label>
+									<select class="custom-select" id="registrar_billing_select">
+										<option>REGFORMAT-RU</option>
+										<option>REGFORMAT-RF</option>
+									</select>
+								</div>
+								<div class="form-group col-12">
+									<label for="registrar_billing_type">Тип запроса</label>
+									<select class="custom-select" id="registrar_billing_type">
+										<option>balance</option>
+										<option>billing</option>
+										<option>forecast</option>
+									</select>
+								</div>
+								<div class="form-group col-12">
+									<button type="submit" class="btn btn-default btn-block" id="registrar_billing_submit">Отправить запрос</button>
+								</div>
+							</div>
+						</form>
+						<div class="col-12 col-sm-12 col-xl-6 col-lg-6 col-md-6" id="registrar_billing_fin"></div>
+					</div>
+
+					<!--REGISTRAR POLL-->
+					<div class="row" id="registrarPoll" style="display: none;">
+						<p class="col-12 text-center">Запрос сообщений реестра</p>
+						<form class="col-12 col-sm-12 col-xl-6 col-lg-6 col-md-6" id="registrar_poll">
+							<div class="row">
+								<div class="form-group col-12">
+									<label for="registrar_poll_select">Выбор регистратора</label>
+									<select class="custom-select" id="registrar_poll_select">
+										<option>REGFORMAT-RU</option>
+										<option>REGFORMAT-RF</option>
+									</select>
+								</div>
+								<div class="form-group col-12">
+									<button type="submit" class="btn btn-default btn-block" id="registrar_poll_submit">Отправить запрос</button>
+								</div>
+							</div>
+						</form>
+						<div class="col-12 col-sm-12 col-xl-6 col-lg-6 col-md-6" id="registrar_poll_fin"></div>
+					</div>
+				</div>
+			</div>
+		</div>
+
+
+
+		<script src="https://code.jquery.com/jquery-3.3.1.js" integrity="sha256-2Kok7MbOyxpgUVvAk/HJ2jigOSYS2auK4Pfzbm7uH60=" crossorigin="anonymous"></script>
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.0/umd/popper.min.js" integrity="sha384-cs/chFZiN24E4KMATLdqdvsezGxaGsi4hLGOzlXwp5UZB1LY//20VyM2taTB4QvJ" crossorigin="anonymous"></script>
+		<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.0/js/bootstrap.min.js" integrity="sha384-uefMccjFJAIv6A+rW+L4AHf99KvxDjWSu1z9VI8SKNVmz4sk7buKt/6v9KI65qnm" crossorigin="anonymous"></script>
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/handlebars.js/4.0.11/handlebars.min.js"></script>
+
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.8.0/js/bootstrap-datepicker.js" integrity="sha256-ncetQ5WcFxZU3YIwggfwOwmewLVX4SHLBtDYnrsxooY=" crossorigin="anonymous"></script>
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.8.0/locales/bootstrap-datepicker.ru.min.js" integrity="sha256-iGDUwn2IPSzlnLlVeCe3M4ZIxQxjUoDYdEO6oBZw/Go=" crossorigin="anonymous"></script>
+		
+
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.devbridge-autocomplete/1.4.7/jquery.autocomplete.min.js" integrity="sha256-g7iXXZetVyr5uce/hhkTaZrF0U8a0UUh4O9cRRtxrFU=" crossorigin="anonymous"></script>
+
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/twbs-pagination/1.4.1/jquery.twbsPagination.min.js" integrity="sha256-01zD/Twu5OwlLXEdcTMwf1rwQSbvBBeY+zD8ZKAo2lc=" crossorigin="anonymous"></script>
+
+		
+		<!--script src="https://cdn.jsdelivr.net/jquery.webui-popover/1.2.1/jquery.webui-popover.min.js"></script-->
+
+
+
+		<script type="text/javascript" src="/static/menu_buttons.js"></script>
+
+		<script type="text/javascript" src="/static/registrar_forms.js"></script>
+
+		<script type="text/javascript" src="/static/contact_forms.js"></script>
+
+		<script type="text/javascript" src="/static/domain_forms.js"></script>
+
+		<script type="text/javascript" src="/static/history_forms.js"></script>
+
+		<script type="text/javascript" src="/static/domain_list.js"></script>
+
+		<script id="result_registrar" type="text/x-handlebars-template">
+			<h6><strong>Результат</strong></h6>
+			{{#if result}}
+				<p>Номер операции - {{clTRID}}</p>
+				{{#each result}}
+					<p>{{this.code}}: {{this.msg}} {{#if this.reason}}, {{this.reason}} {{/if}}</p>
+				{{/each}}
+			{{/if}}
+			{{#if message}}
+				{{#if error}}
+					{{message}}
+				{{else}}
+					<p>Есть неразобранные сообщения реестра</p>
+				{{/if}}
+			{{/if}}
+			{{#if registrar}}
+				<h6><strong>Результат</strong></h6>
+				<p>id: {{registrar.id}}</p>
+				{{#if registrar.status}}
+					<p>status: {{#each registrar.status}}{{this}} {{/each}}</p>
+				{{/if}}
+				<p>Org: {{registrar.locPostalInfo.org}}</p>
+				<p>Address: {{#each registrar.locPostalInfo.address}}{{this}} {{/each}}</p>
+				<p>Int Org: {{registrar.intPostalInfo.org}}</p>
+				<p>Legal Address: {{#each registrar.legalInfo.address}}{{this}} {{/each}}</p>
+				<p>voice: {{#each registrar.voice}}{{this}} {{/each}}</p>
+				{{#if registrar.fax}}
+					<p>status: {{#each registrar.fax}}{{this}} {{/each}}</p>
+				{{/if}}
+				<p>taxpayerNumbers: {{registrar.taxpayerNumbers}}</p>
+				{{#if registrar.email}}
+					{{#each registrar.email}}
+						<p>{{@key}}: {{this}}</p>
+					{{/each}}
+				{{/if}}
+				<p>www: {{registrar.www}}</p>
+				<p>whois: {{registrar.whois}}</p>
+				{{#if registrar.v4}}
+					<p>v4: {{#each registrar.v4}}{{this}} {{/each}}</p>
+				{{/if}}
+				{{#if registrar.v6}}
+					<p>v6: {{#each registrar.v6}}{{this}} {{/each}}</p>
+				{{/if}}
+				{{#if registrar.upDate}}
+					<p>upDate: {{registrar.upDate}}</p>
+				{{/if}}
+				{{#if registrar.crDate}}
+					<p>upDate: {{registrar.crDate}}</p>
+				{{/if}}
+			{{/if}}
+			{{#if limits}}
+				{{#each limits}}
+					<h6><strong>{{@key}}</strong></h6>
+					{{#each this}}
+						<p>{{@key}}: {{this}}</p>
+					{{/each}}
+				{{/each}}
+			{{/if}}
+			{{#if balance}}
+				<h6><strong>Баланс регистратора</strong></h6>
+				{{#each balance}}
+					<p>{{@key}}: {{this}}</p>
+				{{/each}}
+			{{/if}}
+			{{#if billing}}
+				<h6><strong>Стоимость услуг, оказанных регистратору с начала расчетного периода</strong></h6>
+				{{#each billing}}
+					<p>{{@key}}: {{this}}</p>
+				{{/each}}
+			{{/if}}
+			{{#if forecast}}
+				<h6><strong>Прогноз платежей на расчетный период</strong></h6>
+				{{#each forecast}}
+					<p>{{@key}}: {{this}}</p>
+				{{/each}}
+			{{/if}}
+			{{#if poll}}
+				{{#each poll}}
+					<hr/>
+					{{#each this}}
+						<p>{{@key}}: {{this}}</p>
+					{{/each}}
+				{{/each}}
+			{{/if}}
+		</script>
+
+		<script id="result_contact" type="text/x-handlebars-template">
+			<h6><strong>Результат</strong></h6>
+			{{#if result}}
+				<p>Номер операции - {{clTRID}}</p>
+				{{#each result}}
+					<p>{{this.code}}: {{this.msg}} {{#if this.reason}}, {{this.reason}} {{/if}}</p>
+				{{/each}}
+			{{/if}}
+			{{#if message}}
+				{{#if error}}
+					{{message}}
+				{{else}}
+					<p>Есть неразобранные сообщения реестра</p>
+				{{/if}}
+			{{/if}}
+			{{#if contact}}
+				<h6><strong>Информация</strong></h6>
+				<p>id: {{contact.id}}</p>
+				<p>type: {{contact.type}}</p>
+				{{#if contact.locPostalInfo.name}}
+					<p>name: {{contact.locPostalInfo.name}}</p>
+				{{/if}}
+				{{#if contact.intPostalInfo.name}}
+					<p>int name: {{contact.intPostalInfo.name}}</p>
+				{{/if}}
+				{{#if contact.locPostalInfo.org}}
+					<p>org: {{contact.locPostalInfo.org}}</p>
+				{{/if}}
+				{{#if contact.intPostalInfo.org}}
+					<p>int org: {{contact.intPostalInfo.org}}</p>
+				{{/if}}
+				{{#if contact.locPostalInfo.address}}
+					<p>address: {{contact.locPostalInfo.address}}</p>
+				{{/if}}
+				{{#if contact.legalInfo.address}}
+					<p>legal address: {{contact.legalInfo.address}}</p>
+				{{/if}}
+				{{#if contact.birthday}}
+					<p>birthday: {{contact.birthday}}</p>
+				{{/if}}
+				<p>email: {{#each contact.email}}{{this}} {{/each}}</p>
+				<p>voice: {{#each contact.voice}}{{this}} {{/each}}</p>
+				{{#if contact.passport}}
+					<p>passport: {{#each contact.passport}}{{this}} {{/each}}</p>
+				{{/if}}
+				{{#if contact.fax}}
+					<p>fax: {{#each contact.fax}}{{this}} {{/each}}</p>
+				{{/if}}
+				{{#if contact.taxpayerNumbers}}
+					<p>taxpayerNumbers: {{contact.taxpayerNumbers}}</p>
+				{{/if}}
+				<p>status: {{#each contact.status}}{{this}} {{/each}}</p>
+				<p>clID: {{contact.clID}}</p>
+				<p>crID: {{contact.crID}}</p>
+				<p>crDate: {{contact.crDate}}</p>
+				{{#if contact.upDate}}
+					<p>upDate: {{contact.upDate}}</p>
+				{{/if}}
+				<p>verified: {{contact.verified}}</p>
+				<p>roid: {{contact.roid}}</p>
+			{{/if}}
+			{{#if create}}
+				<h6><strong>Информация</strong></h6>
+				<p>name: {{create.id}}</p>
+				<p>crDate: {{create.crDate}}</p>
+			{{/if}}
+			{{#if check}}
+				<h6><strong>Информация</strong></h6>
+				{{#each check}}{{@key}} - {{this}}{{/each}}
+			{{/if}}
+		</script>
+
+		
+
+		<script id="result_domain" type="text/x-handlebars-template">
+			<h6><strong>Результат</strong></h6>
+			{{#if result}}
+				<p>Номер операции - {{clTRID}}</p>
+				{{#each result}}
+					<p>{{this.code}}: {{this.msg}} {{#if this.reason}}, {{this.reason}} {{/if}}</p>
+				{{/each}}
+			{{/if}}
+			{{#if message}}
+				{{#if error}}
+					{{message}}
+				{{else}}
+					<p>Есть неразобранные сообщения реестра</p>
+				{{/if}}
+			{{/if}}
+			{{#if create}}
+				<h6><strong>Домен создан</strong></h6> 
+				<p>Имя домена: {{create.name}}</p>
+				<p>Дата регистрации: {{create.crDate}}</p>
+				<p>Дата окончания регистрации: {{create.exDate}}</p>
+			{{/if}}
+			{{#if check}}
+				<h6><strong>Информация</strong></h6> 
+				{{#each check}}{{@key}} - {{this}}{{/each}}
+			{{/if}}
+			{{#if domain}}
+				<h6><strong>Информация</strong></h6> 
+				<p>Имя: {{domain.name}}</p>
+				<p>Владелец: {{domain.registrant}}</p>
+				<p>crDate: {{domain.crDate}}</p>
+				<p>exDate: {{domain.exDate}}</p>
+				{{#if domain.upDate}}
+					<p>upDate: {{domain.upDate}}</p>
+				{{/if}}	
+				{{#if domain.trDate}}
+					<p>trDate: {{domain.trDate}}</p>
+				{{/if}}
+				<p>Статус: {{#each domain.status}}{{this}} {{/each}}</p>
+				<p>Создатель: {{domain.crID}}</p>
+				<p>Владелец(рег): {{domain.clID}}</p>
+				{{#if domain.hostObj}}
+					<p>НС Сервер: {{#each domain.hostObj}}{{this}} {{/each}}</p>
+				{{/if}}
+				{{#if domain.description}}
+					<p>Описание: {{#each domain.description}}{{this}} {{/each}}</p>
+				{{/if}}
+				{{#if domain.authInfo}}
+					<p>authInfo: {{domain.authInfo}}</p>
+				{{/if}}
+			{{/if}}
+			{{#if transfer}}
+				<h6><strong>Информация</strong></h6> 
+				<p>name: {{transfer.name}}</p>
+				<p>trStatus: {{transfer.trStatus}}</p>
+				<p>reID: {{transfer.reID}}</p>
+				<p>reDate: {{transfer.reDate}}</p>
+				<p>acID: {{transfer.acID}}</p>
+				<p>acDate: {{transfer.acDate}}</p>
+				{{#if transfer.exDate}}
+					<p>exDate: {{transfer.exDate}}</p>
+				{{/if}}
+			{{/if}}
+			{{#if renew}}
+				<h5><strong>Информация</strong></h5> 
+				<p>name: {{renew.name}}</p>
+				<p>exDate: {{renew.exDate}}</p>	
+			{{/if}}
+		</script>
+
+		<script id="history_templ" type="text/x-handlebars-template">
+			<table class="table table-striped">
+				<thead>
+					<tr>
+						<th scope="col">trID</th>
+						<th scope="col">object</th>
+						<th scope="col">command</th>
+						<th scope="col">req</th>
+						<th scope="col">res</th>
+						<th scope="col">b_date</th>
+						<th scope="col">e_date</th>
+						<th scope="col">status</th>
+					</tr>
+				</thead>
+				<tbody>
+					{{#each .}}
+						<tr>
+							<td id="{{this.id}}" class="trid">{{this.id}}</td>
+							<td>{{this.object}}</td>
+							<td>{{this.command}}</td>
+							<td data-toggle="popover" title="Request" data-content='{{this.request}}'>Развернуть запрос</td>
+							<td data-toggle="popover" title="Response" data-content='{{this.response}}'>Показать ответ</td>
+							<td>{{this.date}}</td>
+							<td>{{this.date_cron}}</td>
+							<td>{{this.status}}</td>
+							
+						</tr>
+					{{/each}}
+				</tbody>
+			</table>
+		</script>
+
+		<script id="domainTable_templ" type="text/x-handlebars-template">
+			{{#each .}}
+			<tr>
+				<td onclick="go_to_update($(this).text())">{{this.name}}</td>
+				<td onclick="go_to_contact($(this).text())">{{this.contact}}</td>
+				<td class="poptest">
+					{{#each this.status}}
+						{{this}}</br>
+					{{/each}}
+				</td>
+				<td>
+					{{#each this.nss}}
+						{{this}}</br>
+					{{/each}}
+				</td>
+				<td data-domain="{{this.name}}" onclick="go_to_renew($(this).data('domain'))">{{this.exdate}}</td>
+				<!--td>{{this.upddate}}</td-->
+			</tr>
+			{{/each}}
+		</script>
+
+		<script id="add_nss" type="text/x-handlebars-template">
+			<div class="row full-nss-{{count}}">
+				<div class="input-group mb-3 auto-nss col-6">
+					<input type="text" value="{{ns}}" class="form-control form-control-sm dom_{{command}}_nss_val" data-ip="ip-{{count}}">
+				</div>
+				<div class="input-group mb-3 auto-nss col-6">
+					<input type="text" value="{{ip}}" class="form-control form-control-sm" id="ip-{{count}}">
+					<div class="input-group-append" data-full="full-nss-{{count}}" onclick = "rem_sts_nss(this)">
+						<span class="input-group-text">-</span>
+					</div>
+				</div>
+			</div>
+		</script>
+
+		<script id="add_sts" type="text/x-handlebars-template">
+			<div class="input-group mb-3 auto-sts-{{obj}} col-6 full-sts-{{count}}">
+				<input type="text" value="{{sts}}" class="form-control form-control-sm {{obj}}_status_add">
+				<div class="input-group-append" data-full="full-sts-{{count}}" onclick = "rem_sts_nss(this)">
+					<span class="input-group-text">-</span>
+				</div>
+			</div>
+		</script>
+
+		<script id="alarm_update" type="text/x-handlebars-template">
+			<div class="alert alert-danger" role="alert" id="dom_alarm">
+				Объект "{{obj}}" отсутствует в БД. Продолжение операции приведет к ужасным, необратимым последствиям. Настоятельно рекомендуем, во избежании разрушений и жертв, прежде чем продолжить, скопировать объект в БД
+			</div>
+		</script>
+
+		<script id="templ_email_voice" type="text/x-handlebars-template">
+			<div class="input-group mb-3 auto-email-voice" id="{{value}}-{{count}}">
+				<input type="text" class="form-control form-control-sm con_{{command}}_{{value}}_val" value="{{val}}">
+				<div class="input-group-append" data-rem="{{value}}-{{count}}" onclick = "rem_voice_email(this)">
+					<span class="input-group-text">-</span>
+				</div>
+			</div>
+		</script>
+
+		<script id="templ_registrar_ip" type="text/x-handlebars-template">
+			<div class="alert alert-danger" role="alert" id="dom_alarm">
+				Жизнь так редко дает нам второй шанс. Скорее всего его не будет и в этот раз. Остановитесь, подумайте! Ведь кто знает сколько ужасных, непоправимых вещей и разбитых судеб повлекло за собой лишь одно, необдуманное, нажатие кнопки "Отправить форму"
+			</div>
+		</script>
+
+		<script type="text/javascript">
+			//var URL = 'http://84.38.3.34:8080';
+			$(document).ready(function(){ 
+				$('#loading').fadeOut(200); 
+				$('[data-toggle="popover"]').popover({
+					container: 'body'
+				}); 
+			});
+		</script>
+	</body>
+</html>
